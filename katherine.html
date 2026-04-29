@@ -363,6 +363,74 @@
       to   { opacity: 1; transform: scale(1); }
     }
 
+    /* ===== Tulipanes interactivos ===== */
+    .tulip { cursor: pointer; pointer-events: auto; }
+    .tulip svg { transition: filter 0.4s ease; }
+    .tulip:hover svg {
+      filter: drop-shadow(0 0 18px rgba(255,220,100,0.55)) drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+    }
+    .tulip.active svg {
+      filter: drop-shadow(0 0 34px rgba(255,210,60,0.9)) drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+    }
+
+    /* ===== Modo día ===== */
+    .day-sky {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg,
+        #0a3d7a 0%, #1565c0 15%, #1e88e5 30%,
+        #42a5f5 50%, #90caf9 70%,
+        #c5e8f0 88%, #e8f5e9 100%);
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 3s ease;
+      pointer-events: none;
+    }
+    body.day-mode .day-sky     { opacity: 1; }
+    body.day-mode .milky-way   { opacity: 0; transition: opacity 2s ease; }
+    body.day-mode .stars-static { opacity: 0; transition: opacity 2s ease; }
+    body.day-mode .moon        { opacity: 0 !important; transition: opacity 2s ease; }
+    body.day-mode .ground {
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(80,200,100,0.3) 0%, transparent 70%),
+        linear-gradient(180deg, transparent 0%, rgba(50,140,60,0.55) 30%, rgba(30,100,40,0.85) 70%, rgba(15,60,20,0.95) 100%);
+      transition: background 3s ease;
+    }
+
+    .sun {
+      position: fixed;
+      top: 8%; right: 12%;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fffde7 0%, #fff176 30%, #ffca28 60%, #ff8f00 100%);
+      box-shadow:
+        0 0 0 22px rgba(255,220,50,0.12),
+        0 0 0 44px rgba(255,200,0,0.08),
+        0 0 0 72px rgba(255,180,0,0.05),
+        0 0 65px  rgba(255,230,50,0.8),
+        0 0 130px rgba(255,180,0,0.5),
+        0 0 220px rgba(255,120,0,0.25);
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 2.5s ease;
+      pointer-events: none;
+      animation: sunPulse 7s ease-in-out infinite;
+    }
+    body.day-mode .sun { opacity: 1; }
+    @keyframes sunPulse {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.05); }
+    }
+
+    /* ===== Lluvia ===== */
+    #rain-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      pointer-events: none;
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .tulips-stage { gap: 5px; }
       .tulip { width: 130px; }
@@ -372,13 +440,16 @@
 </head>
 <body>
   <div class="sky"></div>
+  <div class="day-sky"></div>
   <div class="milky-way"></div>
 
   <div class="moon"></div>
+  <div class="sun"></div>
 
   <div class="stars-static" id="stars"></div>
 
   <canvas id="particles-canvas"></canvas>
+  <canvas id="rain-canvas"></canvas>
 
   <div class="ground"></div>
   <div class="soil-mound"></div>
@@ -889,7 +960,9 @@
           petal.setAttribute('rx', pw);
           petal.setAttribute('ry', hl);
           petal.setAttribute('fill', color);
+          petal.setAttribute('data-orig', color);
           petal.setAttribute('opacity', '0.9');
+          petal.classList.add('lily-petal');
           pg.appendChild(petal);
           g.appendChild(pg);
         }
@@ -959,6 +1032,129 @@
       },
       detectRetina: true
     });
+  </script>
+
+  <script>
+    /* ============================================================
+       AUDIO
+    ============================================================ */
+    const songs = {
+      t1: new Audio('until-i-found-you.mp3'),
+      t2: new Audio('ufio-oblivion.mp3'),
+      t3: new Audio('beethoven-fr-elise.mp3')
+    };
+    Object.values(songs).forEach(a => { a.loop = true; a.volume = 0.55; });
+
+    let activeMode = null;
+
+    function setMode(mode) {
+      if (activeMode === mode) {
+        stopMode(activeMode);
+        activeMode = null;
+        return;
+      }
+      if (activeMode) stopMode(activeMode);
+      activeMode = mode;
+      songs[mode].currentTime = 0;
+      songs[mode].play().catch(() => {});
+      document.querySelector('.tulip.' + mode).classList.add('active');
+      if (mode === 't1') enableDay();
+      if (mode === 't2') enableRain();
+      if (mode === 't3') enableCrazyLilies();
+    }
+
+    function stopMode(mode) {
+      songs[mode].pause();
+      songs[mode].currentTime = 0;
+      document.querySelector('.tulip.' + mode).classList.remove('active');
+      if (mode === 't1') disableDay();
+      if (mode === 't2') disableRain();
+      if (mode === 't3') disableCrazyLilies();
+    }
+
+    document.querySelector('.tulip.t1').addEventListener('click', () => setMode('t1'));
+    document.querySelector('.tulip.t2').addEventListener('click', () => setMode('t2'));
+    document.querySelector('.tulip.t3').addEventListener('click', () => setMode('t3'));
+
+    /* ============================================================
+       TULIPÁN 1 — MODO DÍA
+    ============================================================ */
+    function enableDay()  { document.body.classList.add('day-mode'); }
+    function disableDay() { document.body.classList.remove('day-mode'); }
+
+    /* ============================================================
+       TULIPÁN 2 — LLUVIA
+    ============================================================ */
+    const rainCanvas = document.getElementById('rain-canvas');
+    const rainCtx    = rainCanvas.getContext('2d');
+    let rainDrops = [], rainId = null;
+
+    function enableRain() {
+      rainCanvas.width  = window.innerWidth;
+      rainCanvas.height = window.innerHeight;
+      rainCanvas.style.display = 'block';
+      rainDrops = Array.from({ length: 260 }, () => ({
+        x:  Math.random() * rainCanvas.width,
+        y:  Math.random() * rainCanvas.height,
+        len:   12 + Math.random() * 18,
+        speed:  9 + Math.random() * 10,
+        op:   0.25 + Math.random() * 0.45,
+        w:    0.8 + Math.random() * 0.8
+      }));
+      animateRain();
+    }
+
+    function animateRain() {
+      rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+      rainDrops.forEach(d => {
+        rainCtx.beginPath();
+        rainCtx.moveTo(d.x, d.y);
+        rainCtx.lineTo(d.x - 3, d.y + d.len);
+        rainCtx.strokeStyle = `rgba(180, 220, 245, ${d.op})`;
+        rainCtx.lineWidth = d.w;
+        rainCtx.stroke();
+        d.y += d.speed;
+        if (d.y > rainCanvas.height) { d.y = -d.len; d.x = Math.random() * rainCanvas.width; }
+      });
+      rainId = requestAnimationFrame(animateRain);
+    }
+
+    function disableRain() {
+      cancelAnimationFrame(rainId);
+      rainId = null;
+      rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+      rainCanvas.style.display = 'none';
+    }
+
+    window.addEventListener('resize', () => {
+      if (rainId) { rainCanvas.width = window.innerWidth; rainCanvas.height = window.innerHeight; }
+    });
+
+    /* ============================================================
+       TULIPÁN 3 — LIRIOS LOCOS
+    ============================================================ */
+    const crazyColors = [
+      '#ff1493','#ff69b4','#ff4500','#ffd700','#00e5ff',
+      '#7c4dff','#76ff03','#ff6d00','#ea80fc','#18ffff',
+      '#ff3d00','#69f0ae','#40c4ff','#e040fb','#ffff00'
+    ];
+    let lilyInterval = null;
+
+    function enableCrazyLilies() {
+      lilyInterval = setInterval(() => {
+        document.querySelectorAll('.lily-petal').forEach(p => {
+          p.setAttribute('fill', crazyColors[Math.floor(Math.random() * crazyColors.length)]);
+        });
+      }, 75);
+    }
+
+    function disableCrazyLilies() {
+      clearInterval(lilyInterval);
+      lilyInterval = null;
+      document.querySelectorAll('.lily-petal').forEach(p => {
+        p.setAttribute('fill', p.dataset.orig);
+      });
+    }
   </script>
 </body>
 </html>
