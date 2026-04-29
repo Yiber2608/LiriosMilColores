@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Para Katherine ✦</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Italianno&family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --night-deep: #04060f;
+      --tulip-yellow-deep: #c98a05;
+      --tulip-yellow: #f5c518;
+      --tulip-yellow-light: #ffe066;
+      --tulip-yellow-bright: #fff4a8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--night-deep);
+      font-family: 'Cormorant Garamond', serif;
+      color: #e8e4d0;
+      cursor: default;
+    }
+
+    /* ===== Cielo nocturno ===== */
+    .sky {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(74, 95, 156, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(120, 80, 160, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 100%, rgba(20, 58, 35, 0.4) 0%, transparent 60%),
+        linear-gradient(180deg, #02030a 0%, #060c1f 35%, #0a1535 65%, #0d1f3d 100%);
+      z-index: 0;
+    }
+
+    .milky-way {
+      position: fixed;
+      top: -10%; left: -10%;
+      width: 120%; height: 60%;
+      background:
+        radial-gradient(ellipse 60% 25% at 50% 50%, rgba(180, 200, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 15% at 45% 55%, rgba(220, 180, 255, 0.05) 0%, transparent 60%);
+      transform: rotate(-15deg);
+      filter: blur(20px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #particles-canvas {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    }
+
+    /* Luna */
+    .moon {
+      position: fixed;
+      top: 8%; right: 12%;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fffaf0 0%, #f5ecd5 40%, #d4c89a 80%, #aa9967 100%);
+      box-shadow:
+        0 0 40px rgba(255, 245, 200, 0.4),
+        0 0 80px rgba(255, 245, 200, 0.25),
+        0 0 140px rgba(255, 245, 200, 0.15),
+        inset -15px -15px 40px rgba(80, 60, 30, 0.3);
+      z-index: 3;
+      animation: moonPulse 8s ease-in-out infinite;
+    }
+    .moon::before {
+      content: '';
+      position: absolute;
+      inset: -30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 245, 200, 0.15), transparent 70%);
+      z-index: -1;
+    }
+    .moon::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(140, 120, 80, 0.25);
+      top: 30%; left: 25%;
+      box-shadow:
+        25px 35px 0 -3px rgba(140, 120, 80, 0.18),
+        -8px 45px 0 -6px rgba(140, 120, 80, 0.2),
+        40px 15px 0 -8px rgba(140, 120, 80, 0.15);
+    }
+    @keyframes moonPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(255, 245, 200, 0.4), 0 0 80px rgba(255, 245, 200, 0.25), 0 0 140px rgba(255, 245, 200, 0.15), inset -15px -15px 40px rgba(80, 60, 30, 0.3); }
+      50% { box-shadow: 0 0 60px rgba(255, 245, 200, 0.55), 0 0 120px rgba(255, 245, 200, 0.35), 0 0 180px rgba(255, 245, 200, 0.2), inset -15px -15px 40px rgba(80, 60, 30, 0.3); }
+    }
+
+    /* Estrellas */
+    .stars-static { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--dur, 3s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .star.bright { box-shadow: 0 0 6px rgba(255,255,255,0.9), 0 0 12px rgba(180, 200, 255, 0.5); }
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--max, 1); transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(0.6); }
+    }
+
+    .shooting-star {
+      position: fixed;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 6px white;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* ===== Suelo / tierra ===== */
+    .ground {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 28vh;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(45, 138, 82, 0.18) 0%, transparent 70%),
+        linear-gradient(180deg, transparent 0%, rgba(15, 53, 32, 0.4) 30%, rgba(8, 30, 18, 0.85) 70%, rgba(20, 12, 6, 0.95) 100%);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .soil-mound {
+      position: fixed;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      max-width: 900px;
+      height: 90px;
+      background: radial-gradient(ellipse at 50% 100%, #2a1810 0%, #1a0e08 40%, transparent 70%);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      z-index: 6;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    .grass-blade {
+      position: fixed;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to top, #0a2614 0%, #1d5a37 60%, #2d8a52 100%);
+      border-radius: 50% 50% 0 0;
+      z-index: 7;
+      transform-origin: bottom center;
+      animation: grassSway 3s ease-in-out infinite;
+    }
+    @keyframes grassSway {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    .mist {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 30vh;
+      background: radial-gradient(ellipse at 50% 100%, rgba(140, 180, 200, 0.12) 0%, transparent 60%);
+      z-index: 8;
+      pointer-events: none;
+      animation: mistDrift 20s ease-in-out infinite alternate;
+    }
+    @keyframes mistDrift {
+      from { transform: translateX(-30px); opacity: 0.7; }
+      to { transform: translateX(30px); opacity: 1; }
+    }
+
+    /* ===== Tulipanes con animación de brote ===== */
+    .tulips-stage {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 40px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .tulip {
+      position: relative;
+      width: 240px;
+      height: 75vh;
+      transform-origin: bottom center;
+      transform: scaleY(0.02) scaleX(0.3);
+      opacity: 0;
+      animation: bloom 4.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    }
+    .tulip.t1 { animation-delay: 0.3s; }
+    .tulip.t2 { animation-delay: 0.8s; z-index: 11; }
+    .tulip.t3 { animation-delay: 1.3s; }
+
+    /* Brote: crece desde abajo hacia arriba */
+    @keyframes bloom {
+      0% {
+        transform: scaleY(0.02) scaleX(0.3);
+        opacity: 0;
+      }
+      8% {
+        opacity: 1;
+      }
+      40% {
+        transform: scaleY(0.45) scaleX(0.85);
+      }
+      75% {
+        transform: scaleY(0.95) scaleX(1.02);
+      }
+      90% {
+        transform: scaleY(1.02) scaleX(0.98);
+      }
+      100% {
+        transform: scaleY(1) scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    /* Sway sutil después del brote */
+    .tulip-inner {
+      width: 100%;
+      height: 100%;
+      transform-origin: bottom center;
+      animation: sway 6s ease-in-out infinite;
+      animation-delay: 5s;
+    }
+    @keyframes sway {
+      0%, 100% { transform: rotate(-1.5deg); }
+      50% { transform: rotate(1.5deg); }
+    }
+
+    .tulip svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+    }
+
+    /* Resplandor en la base cuando brota */
+    .sprout-glow {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 30px;
+      background: radial-gradient(ellipse, rgba(255, 220, 100, 0.6) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(8px);
+      opacity: 0;
+      animation: sproutGlow 4s ease-out forwards;
+    }
+    .tulip.t1 .sprout-glow { animation-delay: 0.3s; }
+    .tulip.t2 .sprout-glow { animation-delay: 0.8s; }
+    .tulip.t3 .sprout-glow { animation-delay: 1.3s; }
+    @keyframes sproutGlow {
+      0% { opacity: 0; transform: translateX(-50%) scale(0.3); }
+      30% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+      100% { opacity: 0; transform: translateX(-50%) scale(2); }
+    }
+
+    /* ===== Firma central ===== */
+    .signature {
+      position: fixed;
+      top: 16%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      text-align: center;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0;
+      animation: fadeInSig 3s ease-out 6s forwards;
+    }
+    .signature .small {
+      font-size: 0.95rem;
+      letter-spacing: 0.6em;
+      text-transform: uppercase;
+      color: rgba(232, 228, 208, 0.55);
+      margin-bottom: 0.5rem;
+      font-weight: 300;
+    }
+    .signature .name {
+      font-family: 'Italianno', cursive;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      color: rgba(255, 244, 168, 0.92);
+      text-shadow:
+        0 0 15px rgba(255, 244, 168, 0.5),
+        0 0 35px rgba(255, 220, 100, 0.35),
+        0 0 60px rgba(255, 200, 80, 0.2);
+      line-height: 1;
+      animation: nameGlow 5s ease-in-out infinite 6s;
+    }
+    @keyframes nameGlow {
+      0%, 100% { text-shadow: 0 0 15px rgba(255, 244, 168, 0.5), 0 0 35px rgba(255, 220, 100, 0.35), 0 0 60px rgba(255, 200, 80, 0.2); }
+      50% { text-shadow: 0 0 25px rgba(255, 244, 168, 0.7), 0 0 55px rgba(255, 220, 100, 0.45), 0 0 90px rgba(255, 200, 80, 0.3); }
+    }
+    @keyframes fadeInSig { to { opacity: 1; } }
+
+    .hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      color: rgba(232, 228, 208, 0.35);
+      text-transform: uppercase;
+      z-index: 25;
+      animation: hintPulse 3s ease-in-out infinite, fadeInSig 3s ease-out 6.5s forwards;
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    /* ===== LETRAS VISIBLES EN LAS HOJAS ===== */
+    .leaf-letter {
+      font-family: 'Great Vibes', 'Italianno', cursive;
+      fill: #fff4a8;
+      font-weight: 400;
+      opacity: 0;
+      filter: drop-shadow(0 0 4px rgba(255, 220, 100, 0.8)) drop-shadow(0 0 10px rgba(255, 200, 80, 0.5));
+      animation: letterAppear 1.8s ease-out forwards;
+      paint-order: stroke fill;
+      stroke: rgba(80, 50, 5, 0.5);
+      stroke-width: 0.8;
+    }
+    @keyframes letterAppear {
+      0% { opacity: 0; transform: scale(0.4); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Delays para que aparezcan en orden K-A-T-H-E-R-I-N-E después del brote */
+    .l-K { animation-delay: 5.5s; }
+    .l-A { animation-delay: 5.8s; }
+    .l-T { animation-delay: 6.1s; }
+    .l-H { animation-delay: 6.4s; }
+    .l-E1 { animation-delay: 6.7s; }
+    .l-R { animation-delay: 7.0s; }
+    .l-I { animation-delay: 7.3s; }
+    .l-N { animation-delay: 7.6s; }
+    .l-E2 { animation-delay: 7.9s; }
+
+    /* Luciérnagas */
+    .firefly {
+      position: fixed;
+      width: 4px; height: 4px;
+      background: #fff4a8;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #fff4a8, 0 0 16px rgba(255, 220, 100, 0.6), 0 0 30px rgba(255, 200, 80, 0.4);
+      z-index: 15;
+      pointer-events: none;
+      opacity: 0;
+      animation: fireflyFloat var(--fdur, 12s) ease-in-out infinite, fireflyBlink 2s ease-in-out infinite, fadeInSig 2s ease-out 7s forwards;
+    }
+    @keyframes fireflyFloat {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(40px, -60px); }
+      50%  { transform: translate(-30px, -100px); }
+      75%  { transform: translate(50px, -50px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes fireflyBlink {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .tulips-stage { gap: 5px; }
+      .tulip { width: 130px; }
+      .moon { width: 70px; height: 70px; top: 5%; right: 8%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky"></div>
+  <div class="milky-way"></div>
+
+  <div class="moon"></div>
+
+  <div class="stars-static" id="stars"></div>
+
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="ground"></div>
+  <div class="soil-mound"></div>
+  <div id="grass-container"></div>
+  <div class="mist"></div>
+
+  <div class="signature">
+    <div class="small">Para ti</div>
+    <div class="name">Katherine</div>
+  </div>
+
+  <!-- Tulipanes -->
+  <div class="tulips-stage">
+
+    <!-- ============ TULIPÁN 1 (Izquierda) – letras: K, A, T ============ -->
+    <div class="tulip t1">
+      <div class="sprout-glow"></div>
+      <div class="tulip-inner">
+      <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="petal1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff4a8"/>
+            <stop offset="35%" stop-color="#ffe066"/>
+            <stop offset="70%" stop-color="#f5c518"/>
+            <stop offset="100%" stop-color="#c98a05"/>
+          </linearGradient>
+          <linearGradient id="petalShadow1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
+            <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
+          </linearGradient>
+          <radialGradient id="petalHighlight1" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.85"/>
+            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="stem1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0a2614"/>
+            <stop offset="35%" stop-color="#1d5a37"/>
+            <stop offset="65%" stop-color="#2a6840"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2d8a52"/>
+            <stop offset="50%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf1b" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3aa462"/>
+            <stop offset="60%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <filter id="softShadow1"><feGaussianBlur stdDeviation="4"/></filter>
+        </defs>
+
+        <!-- TALLO -->
+        <path d="M 120 700 Q 115 500, 118 350 Q 122 220, 120 130"
+              stroke="url(#stem1)" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M 120 700 Q 115 500, 118 350 Q 122 220, 120 130"
+              stroke="#3a7a4f" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"
+              transform="translate(-2, 0)"/>
+
+        <!-- HOJA GRANDE INFERIOR IZQUIERDA con K -->
+        <g>
+          <path d="M 118 480
+                   Q 50 450, 18 380
+                   Q 0 320, 28 270
+                   Q 60 315, 90 380
+                   Q 112 430, 118 480 Z"
+                fill="url(#leaf1)" stroke="#0a2614" stroke-width="1.5"/>
+          <path d="M 118 480 Q 88 420, 55 350 Q 38 305, 28 270"
+                stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.6"/>
+          <path d="M 100 450 Q 78 432, 58 412 M 88 410 Q 68 395, 48 380 M 78 370 Q 58 360, 40 345"
+                stroke="#0a2614" stroke-width="0.6" fill="none" opacity="0.4"/>
+          <text class="leaf-letter l-K" x="48" y="395" transform="rotate(-22 48 395)" font-size="58">K</text>
+        </g>
+
+        <!-- HOJA MEDIANA DERECHA con A -->
+        <g>
+          <path d="M 120 380
+                   Q 175 360, 210 305
+                   Q 225 265, 208 220
+                   Q 175 260, 148 305
+                   Q 125 345, 120 380 Z"
+                fill="url(#leaf1b)" stroke="#0a2614" stroke-width="1.5"/>
+          <path d="M 120 380 Q 152 340, 185 285 Q 200 255, 208 220"
+                stroke="#0a2614" stroke-width="1" fill="none" opacity="0.55"/>
+          <path d="M 138 350 Q 158 333, 180 318 M 148 320 Q 168 308, 188 295"
+                stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
+          <text class="leaf-letter l-A" x="155" y="298" transform="rotate(32 155 298)" font-size="54">A</text>
+        </g>
+
+        <!-- HOJA PEQUEÑA IZQUIERDA SUPERIOR con T -->
+        <g>
+          <path d="M 120 250
+                   Q 75 235, 50 195
+                   Q 38 165, 55 140
+                   Q 80 175, 98 215
+                   Q 115 240, 120 250 Z"
+                fill="url(#leaf1)" stroke="#0a2614" stroke-width="1.2"/>
+          <path d="M 120 250 Q 88 215, 65 175 Q 55 158, 55 140"
+                stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <text class="leaf-letter l-T" x="60" y="200" transform="rotate(-18 60 200)" font-size="50">T</text>
+        </g>
+
+        <!-- ============ FLOR ============ -->
+        <g transform="translate(120, 130)">
+          <ellipse cx="0" cy="5" rx="42" ry="8" fill="#000" opacity="0.25" filter="url(#softShadow1)"/>
+
+          <path d="M -38 0 C -50 -25, -55 -65, -45 -100 C -38 -125, -22 -135, -5 -130 C -8 -90, -12 -45, -10 0 Z"
+                fill="url(#petal1)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M -38 0 C -50 -25, -55 -65, -45 -100"
+                stroke="url(#petalShadow1)" stroke-width="2" fill="none" opacity="0.6"/>
+
+          <path d="M 38 0 C 50 -25, 55 -65, 45 -100 C 38 -125, 22 -135, 5 -130 C 8 -90, 12 -45, 10 0 Z"
+                fill="url(#petal1)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M 38 0 C 50 -25, 55 -65, 45 -100"
+                stroke="url(#petalShadow1)" stroke-width="2" fill="none" opacity="0.6"/>
+
+          <path d="M -32 5 C -42 -20, -42 -70, -32 -110 C -22 -135, -8 -138, 0 -135 C 0 -90, -5 -40, -8 5 Z"
+                fill="url(#petal1)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M -25 -10 C -32 -50, -30 -90, -20 -120"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="-18" cy="-70" rx="8" ry="35" fill="url(#petalHighlight1)" opacity="0.7"/>
+
+          <path d="M 32 5 C 42 -20, 42 -70, 32 -110 C 22 -135, 8 -138, 0 -135 C 0 -90, 5 -40, 8 5 Z"
+                fill="url(#petal1)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M 25 -10 C 32 -50, 30 -90, 20 -120"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="18" cy="-70" rx="8" ry="35" fill="url(#petalHighlight1)" opacity="0.7"/>
+
+          <path d="M 0 5 C 0 -40, 0 -90, 0 -135"
+                stroke="#a87405" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+          <ellipse cx="-15" cy="-100" rx="3" ry="6" fill="#fffae0" opacity="0.85"/>
+          <ellipse cx="20" cy="-80" rx="2" ry="5" fill="#fffae0" opacity="0.7"/>
+          <ellipse cx="-30" cy="-50" rx="2" ry="4" fill="#fffae0" opacity="0.6"/>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <!-- ============ TULIPÁN 2 (Centro) – letras: H, E, R ============ -->
+    <div class="tulip t2">
+      <div class="sprout-glow"></div>
+      <div class="tulip-inner">
+      <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="petal2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff4a8"/>
+            <stop offset="35%" stop-color="#ffe066"/>
+            <stop offset="70%" stop-color="#f5c518"/>
+            <stop offset="100%" stop-color="#c98a05"/>
+          </linearGradient>
+          <linearGradient id="petalShadow2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
+            <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
+          </linearGradient>
+          <radialGradient id="petalHighlight2" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="stem2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0a2614"/>
+            <stop offset="35%" stop-color="#1d5a37"/>
+            <stop offset="65%" stop-color="#2a6840"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2d8a52"/>
+            <stop offset="50%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf2b" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3aa462"/>
+            <stop offset="60%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <filter id="softShadow2"><feGaussianBlur stdDeviation="4"/></filter>
+        </defs>
+
+        <path d="M 120 700 Q 123 500, 120 350 Q 117 220, 120 110"
+              stroke="url(#stem2)" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M 120 700 Q 123 500, 120 350 Q 117 220, 120 110"
+              stroke="#3a7a4f" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"
+              transform="translate(-2.5, 0)"/>
+
+        <!-- HOJA INFERIOR DERECHA con H -->
+        <g>
+          <path d="M 122 500
+                   Q 180 480, 215 395
+                   Q 230 335, 208 285
+                   Q 175 330, 150 388
+                   Q 128 450, 122 500 Z"
+                fill="url(#leaf2b)" stroke="#0a2614" stroke-width="1.5"/>
+          <path d="M 122 500 Q 152 442, 182 372 Q 200 320, 208 285"
+                stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.55"/>
+          <path d="M 138 470 Q 162 450, 188 425 M 152 425 Q 175 408, 195 388 M 165 388 Q 182 376, 198 358"
+                stroke="#0a2614" stroke-width="0.6" fill="none" opacity="0.4"/>
+          <text class="leaf-letter l-H" x="158" y="412" transform="rotate(28 158 412)" font-size="60">H</text>
+        </g>
+
+        <!-- HOJA INFERIOR IZQUIERDA con E -->
+        <g>
+          <path d="M 118 460
+                   Q 60 440, 32 378
+                   Q 18 338, 32 300
+                   Q 60 338, 88 385
+                   Q 112 425, 118 460 Z"
+                fill="url(#leaf2)" stroke="#0a2614" stroke-width="1.4"/>
+          <path d="M 118 460 Q 88 410, 58 358 Q 40 328, 32 300"
+                stroke="#0a2614" stroke-width="1" fill="none" opacity="0.5"/>
+          <path d="M 95 425 Q 75 412, 55 397 M 85 390 Q 65 378, 48 365"
+                stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
+          <text class="leaf-letter l-E1" x="55" y="385" transform="rotate(-22 55 385)" font-size="56">E</text>
+        </g>
+
+        <!-- HOJA SUPERIOR IZQUIERDA con R -->
+        <g>
+          <path d="M 120 280
+                   Q 70 260, 48 215
+                   Q 38 185, 55 162
+                   Q 80 195, 98 230
+                   Q 115 265, 120 280 Z"
+                fill="url(#leaf2)" stroke="#0a2614" stroke-width="1.2"/>
+          <path d="M 120 280 Q 88 240, 68 200 Q 58 180, 55 162"
+                stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <text class="leaf-letter l-R" x="60" y="225" transform="rotate(-22 60 225)" font-size="52">R</text>
+        </g>
+
+        <!-- ============ FLOR ============ -->
+        <g transform="translate(120, 110)">
+          <ellipse cx="0" cy="5" rx="46" ry="9" fill="#000" opacity="0.3" filter="url(#softShadow2)"/>
+
+          <path d="M -42 5 C -55 -28, -62 -72, -50 -110 C -42 -138, -25 -148, -5 -143 C -8 -100, -13 -50, -10 5 Z"
+                fill="url(#petal2)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M -42 5 C -55 -28, -62 -72, -50 -110"
+                stroke="url(#petalShadow2)" stroke-width="2.2" fill="none" opacity="0.6"/>
+
+          <path d="M 42 5 C 55 -28, 62 -72, 50 -110 C 42 -138, 25 -148, 5 -143 C 8 -100, 13 -50, 10 5 Z"
+                fill="url(#petal2)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M 42 5 C 55 -28, 62 -72, 50 -110"
+                stroke="url(#petalShadow2)" stroke-width="2.2" fill="none" opacity="0.6"/>
+
+          <path d="M -35 8 C -46 -22, -46 -76, -35 -120 C -24 -148, -8 -150, 0 -148 C 0 -100, -5 -45, -8 8 Z"
+                fill="url(#petal2)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M -28 -10 C -36 -55, -33 -98, -22 -130"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="-20" cy="-78" rx="9" ry="40" fill="url(#petalHighlight2)" opacity="0.75"/>
+
+          <path d="M 35 8 C 46 -22, 46 -76, 35 -120 C 24 -148, 8 -150, 0 -148 C 0 -100, 5 -45, 8 8 Z"
+                fill="url(#petal2)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M 28 -10 C 36 -55, 33 -98, 22 -130"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="20" cy="-78" rx="9" ry="40" fill="url(#petalHighlight2)" opacity="0.75"/>
+
+          <path d="M 0 8 C 0 -45, 0 -100, 0 -148"
+                stroke="#a87405" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+          <ellipse cx="-17" cy="-110" rx="3.5" ry="7" fill="#fffae0" opacity="0.9"/>
+          <ellipse cx="22" cy="-90" rx="2.5" ry="6" fill="#fffae0" opacity="0.75"/>
+          <ellipse cx="-32" cy="-55" rx="2.5" ry="5" fill="#fffae0" opacity="0.65"/>
+          <ellipse cx="30" cy="-40" rx="2" ry="4" fill="#fffae0" opacity="0.55"/>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <!-- ============ TULIPÁN 3 (Derecha) – letras: I, N, E ============ -->
+    <div class="tulip t3">
+      <div class="sprout-glow"></div>
+      <div class="tulip-inner">
+      <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="petal3" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff4a8"/>
+            <stop offset="35%" stop-color="#ffe066"/>
+            <stop offset="70%" stop-color="#f5c518"/>
+            <stop offset="100%" stop-color="#c98a05"/>
+          </linearGradient>
+          <linearGradient id="petalShadow3" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
+            <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
+          </linearGradient>
+          <radialGradient id="petalHighlight3" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.85"/>
+            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="stem3" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0a2614"/>
+            <stop offset="35%" stop-color="#1d5a37"/>
+            <stop offset="65%" stop-color="#2a6840"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2d8a52"/>
+            <stop offset="50%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <linearGradient id="leaf3b" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3aa462"/>
+            <stop offset="60%" stop-color="#1d5a37"/>
+            <stop offset="100%" stop-color="#0a2614"/>
+          </linearGradient>
+          <filter id="softShadow3"><feGaussianBlur stdDeviation="4"/></filter>
+        </defs>
+
+        <path d="M 120 700 Q 125 500, 122 350 Q 118 220, 120 130"
+              stroke="url(#stem3)" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M 120 700 Q 125 500, 122 350 Q 118 220, 120 130"
+              stroke="#3a7a4f" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"
+              transform="translate(-2, 0)"/>
+
+        <!-- HOJA INFERIOR DERECHA con I -->
+        <g>
+          <path d="M 122 480
+                   Q 178 460, 210 388
+                   Q 225 332, 205 285
+                   Q 172 328, 148 378
+                   Q 128 430, 122 480 Z"
+                fill="url(#leaf3b)" stroke="#0a2614" stroke-width="1.5"/>
+          <path d="M 122 480 Q 152 425, 178 360 Q 195 315, 205 285"
+                stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.55"/>
+          <path d="M 138 450 Q 160 432, 185 410 M 152 410 Q 172 395, 192 378"
+                stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.4"/>
+          <text class="leaf-letter l-I" x="170" y="395" transform="rotate(28 170 395)" font-size="56">I</text>
+        </g>
+
+        <!-- HOJA MEDIANA IZQUIERDA con N -->
+        <g>
+          <path d="M 118 380
+                   Q 55 360, 28 305
+                   Q 15 270, 30 232
+                   Q 55 270, 82 312
+                   Q 105 345, 118 380 Z"
+                fill="url(#leaf3)" stroke="#0a2614" stroke-width="1.4"/>
+          <path d="M 118 380 Q 85 335, 58 290 Q 40 260, 30 232"
+                stroke="#0a2614" stroke-width="1" fill="none" opacity="0.5"/>
+          <path d="M 95 350 Q 75 340, 55 325 M 85 320 Q 65 310, 48 298"
+                stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
+          <text class="leaf-letter l-N" x="45" y="305" transform="rotate(-22 45 305)" font-size="56">N</text>
+        </g>
+
+        <!-- HOJA PEQUEÑA SUPERIOR DERECHA con E -->
+        <g>
+          <path d="M 120 250
+                   Q 158 235, 178 195
+                   Q 188 165, 170 142
+                   Q 145 175, 128 210
+                   Q 118 235, 120 250 Z"
+                fill="url(#leaf3b)" stroke="#0a2614" stroke-width="1.2"/>
+          <path d="M 120 250 Q 145 215, 165 175 Q 175 158, 170 142"
+                stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <text class="leaf-letter l-E2" x="138" y="200" transform="rotate(22 138 200)" font-size="50">E</text>
+        </g>
+
+        <!-- ============ FLOR ============ -->
+        <g transform="translate(120, 130)">
+          <ellipse cx="0" cy="5" rx="40" ry="8" fill="#000" opacity="0.25" filter="url(#softShadow3)"/>
+
+          <path d="M -36 0 C -48 -25, -53 -62, -43 -98 C -36 -123, -20 -132, -3 -128 C -6 -88, -10 -42, -8 0 Z"
+                fill="url(#petal3)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M -36 0 C -48 -25, -53 -62, -43 -98"
+                stroke="url(#petalShadow3)" stroke-width="2" fill="none" opacity="0.6"/>
+
+          <path d="M 36 0 C 48 -25, 53 -62, 43 -98 C 36 -123, 20 -132, 3 -128 C 6 -88, 10 -42, 8 0 Z"
+                fill="url(#petal3)" stroke="#a87405" stroke-width="0.8" opacity="0.92"/>
+          <path d="M 36 0 C 48 -25, 53 -62, 43 -98"
+                stroke="url(#petalShadow3)" stroke-width="2" fill="none" opacity="0.6"/>
+
+          <path d="M -30 5 C -40 -20, -40 -68, -30 -108 C -20 -132, -6 -135, 0 -132 C 0 -88, -4 -38, -7 5 Z"
+                fill="url(#petal3)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M -23 -10 C -30 -48, -28 -88, -18 -118"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="-17" cy="-68" rx="8" ry="33" fill="url(#petalHighlight3)" opacity="0.7"/>
+
+          <path d="M 30 5 C 40 -20, 40 -68, 30 -108 C 20 -132, 6 -135, 0 -132 C 0 -88, 4 -38, 7 5 Z"
+                fill="url(#petal3)" stroke="#c98a05" stroke-width="1"/>
+          <path d="M 23 -10 C 30 -48, 28 -88, 18 -118"
+                stroke="#a87405" stroke-width="1.5" fill="none" opacity="0.45"/>
+          <ellipse cx="17" cy="-68" rx="8" ry="33" fill="url(#petalHighlight3)" opacity="0.7"/>
+
+          <path d="M 0 5 C 0 -38, 0 -88, 0 -132"
+                stroke="#a87405" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+          <ellipse cx="-13" cy="-98" rx="3" ry="6" fill="#fffae0" opacity="0.85"/>
+          <ellipse cx="18" cy="-78" rx="2" ry="5" fill="#fffae0" opacity="0.7"/>
+          <ellipse cx="-28" cy="-48" rx="2" ry="4" fill="#fffae0" opacity="0.6"/>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hint">✦  un jardín bajo las estrellas  ✦</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/[email protected]/tsparticles.bundle.min.js"></script>
+
+  <script>
+    (function generateStars() {
+      const container = document.getElementById('stars');
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star' + (Math.random() > 0.85 ? ' bright' : '');
+        const size = Math.random() * 2.5 + 0.5;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 75 + '%';
+        star.style.setProperty('--dur', (Math.random() * 4 + 2) + 's');
+        star.style.setProperty('--delay', (Math.random() * 5) + 's');
+        star.style.setProperty('--max', (Math.random() * 0.6 + 0.4));
+        container.appendChild(star);
+      }
+    })();
+
+    (function generateGrass() {
+      const container = document.getElementById('grass-container');
+      const count = 60;
+      for (let i = 0; i < count; i++) {
+        const blade = document.createElement('div');
+        blade.className = 'grass-blade';
+        const height = 8 + Math.random() * 18;
+        blade.style.height = height + 'px';
+        blade.style.left = Math.random() * 100 + '%';
+        blade.style.animationDelay = (Math.random() * 3) + 's';
+        blade.style.animationDuration = (2 + Math.random() * 2) + 's';
+        container.appendChild(blade);
+      }
+    })();
+
+    function createShootingStar() {
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * (window.innerHeight * 0.4);
+      const angle = -25 + Math.random() * 20;
+      const distance = 400 + Math.random() * 300;
+
+      star.style.left = startX + 'px';
+      star.style.top = startY + 'px';
+      document.body.appendChild(star);
+
+      const endX = startX + Math.cos(angle * Math.PI / 180) * distance;
+      const endY = startY + Math.sin(angle * Math.PI / 180) * distance + 200;
+
+      star.animate([
+        { transform: `translate(0, 0)`, opacity: 0 },
+        { opacity: 1, offset: 0.1 },
+        { opacity: 1, offset: 0.7 },
+        { transform: `translate(${endX - startX}px, ${endY - startY}px)`, opacity: 0 }
+      ], {
+        duration: 1500 + Math.random() * 1000,
+        easing: 'cubic-bezier(0.4, 0, 0.6, 1)'
+      }).onfinish = () => star.remove();
+    }
+    setInterval(createShootingStar, 4500);
+    setTimeout(createShootingStar, 1500);
+
+    (function createFireflies() {
+      const count = 12;
+      for (let i = 0; i < count; i++) {
+        const f = document.createElement('div');
+        f.className = 'firefly';
+        f.style.left = (15 + Math.random() * 70) + '%';
+        f.style.bottom = (10 + Math.random() * 50) + '%';
+        f.style.setProperty('--fdur', (8 + Math.random() * 8) + 's');
+        f.style.animationDelay = (Math.random() * 5) + 's, ' + (Math.random() * 2) + 's, ' + (7 + Math.random()) + 's';
+        document.body.appendChild(f);
+      }
+    })();
+
+    tsParticles.load("particles-canvas", {
+      fpsLimit: 60,
+      background: { color: { value: "transparent" } },
+      particles: {
+        number: { value: 80, density: { enable: true, area: 900 } },
+        color: { value: ["#ffffff", "#e0e8ff", "#ffe066", "#fff4a8"] },
+        shape: { type: "circle" },
+        opacity: { value: { min: 0.1, max: 0.7 }, animation: { enable: true, speed: 0.6, sync: false } },
+        size: { value: { min: 0.5, max: 1.8 }, animation: { enable: true, speed: 1.5, minimumValue: 0.3, sync: false } },
+        move: { enable: true, speed: 0.25, direction: "none", random: true, straight: false, outModes: { default: "out" } },
+        links: { enable: true, distance: 130, color: "#7a8db0", opacity: 0.12, width: 0.6 }
+      },
+      interactivity: {
+        events: { onHover: { enable: true, mode: "grab" }, onClick: { enable: true, mode: "push" }, resize: true },
+        modes: { grab: { distance: 160, links: { opacity: 0.4 } }, push: { quantity: 3 } }
+      },
+      detectRetina: true
+    });
+  </script>
+</body>
+</html>
