@@ -275,42 +275,6 @@
       100% { opacity: 0; transform: translateX(-50%) scale(2); }
     }
 
-    /* ===== Firma central ===== */
-    .signature {
-      position: fixed;
-      top: 16%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      text-align: center;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      opacity: 0;
-      animation: fadeInSig 3s ease-out 6s forwards;
-    }
-    .signature .small {
-      font-size: 0.95rem;
-      letter-spacing: 0.6em;
-      text-transform: uppercase;
-      color: rgba(232, 228, 208, 0.55);
-      margin-bottom: 0.5rem;
-      font-weight: 300;
-    }
-    .signature .name {
-      font-family: 'Italianno', cursive;
-      font-size: clamp(3.5rem, 9vw, 7rem);
-      color: rgba(255, 244, 168, 0.92);
-      text-shadow:
-        0 0 15px rgba(255, 244, 168, 0.5),
-        0 0 35px rgba(255, 220, 100, 0.35),
-        0 0 60px rgba(255, 200, 80, 0.2);
-      line-height: 1;
-      animation: nameGlow 5s ease-in-out infinite 6s;
-    }
-    @keyframes nameGlow {
-      0%, 100% { text-shadow: 0 0 15px rgba(255, 244, 168, 0.5), 0 0 35px rgba(255, 220, 100, 0.35), 0 0 60px rgba(255, 200, 80, 0.2); }
-      50% { text-shadow: 0 0 25px rgba(255, 244, 168, 0.7), 0 0 55px rgba(255, 220, 100, 0.45), 0 0 90px rgba(255, 200, 80, 0.3); }
-    }
     @keyframes fadeInSig { to { opacity: 1; } }
 
     .hint {
@@ -332,21 +296,20 @@
       50% { opacity: 0.8; }
     }
 
-    /* ===== LETRAS VISIBLES EN LAS HOJAS ===== */
+    /* ===== LETRAS OCULTAS EN LAS HOJAS ===== */
     .leaf-letter {
       font-family: 'Great Vibes', 'Italianno', cursive;
-      fill: #fff4a8;
+      fill: rgba(255, 244, 168, 0.55);
       font-weight: 400;
       opacity: 0;
-      filter: drop-shadow(0 0 4px rgba(255, 220, 100, 0.8)) drop-shadow(0 0 10px rgba(255, 200, 80, 0.5));
-      animation: letterAppear 1.8s ease-out forwards;
+      animation: letterAppear 2s ease-out forwards;
       paint-order: stroke fill;
-      stroke: rgba(80, 50, 5, 0.5);
-      stroke-width: 0.8;
+      stroke: rgba(20, 60, 30, 0.4);
+      stroke-width: 0.5;
     }
     @keyframes letterAppear {
-      0% { opacity: 0; transform: scale(0.4); }
-      100% { opacity: 1; transform: scale(1); }
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
 
     /* Delays para que aparezcan en orden K-A-T-H-E-R-I-N-E después del brote */
@@ -384,6 +347,22 @@
       50% { opacity: 1; }
     }
 
+    /* ===== Lirios del suelo ===== */
+    #lilies-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 32vh;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    @keyframes lilyAppear {
+      from { opacity: 0; transform: scale(0.1); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
     @media (max-width: 768px) {
       .tulips-stage { gap: 5px; }
       .tulip { width: 130px; }
@@ -405,11 +384,6 @@
   <div class="soil-mound"></div>
   <div id="grass-container"></div>
   <div class="mist"></div>
-
-  <div class="signature">
-    <div class="small">Para ti</div>
-    <div class="name">Katherine</div>
-  </div>
 
   <!-- Tulipanes -->
   <div class="tulips-stage">
@@ -473,7 +447,7 @@
                 stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.6"/>
           <path d="M 100 450 Q 78 432, 58 412 M 88 410 Q 68 395, 48 380 M 78 370 Q 58 360, 40 345"
                 stroke="#0a2614" stroke-width="0.6" fill="none" opacity="0.4"/>
-          <text class="leaf-letter l-K" x="48" y="395" transform="rotate(-22 48 395)" font-size="58">K</text>
+          <text class="leaf-letter l-K" x="52" y="390" transform="rotate(-22 52 390)" font-size="38">K</text>
         </g>
 
         <!-- HOJA MEDIANA DERECHA con A -->
@@ -488,7 +462,7 @@
                 stroke="#0a2614" stroke-width="1" fill="none" opacity="0.55"/>
           <path d="M 138 350 Q 158 333, 180 318 M 148 320 Q 168 308, 188 295"
                 stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
-          <text class="leaf-letter l-A" x="155" y="298" transform="rotate(32 155 298)" font-size="54">A</text>
+          <text class="leaf-letter l-A" x="160" y="295" transform="rotate(32 160 295)" font-size="36">A</text>
         </g>
 
         <!-- HOJA PEQUEÑA IZQUIERDA SUPERIOR con T -->
@@ -501,7 +475,7 @@
                 fill="url(#leaf1)" stroke="#0a2614" stroke-width="1.2"/>
           <path d="M 120 250 Q 88 215, 65 175 Q 55 158, 55 140"
                 stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
-          <text class="leaf-letter l-T" x="60" y="200" transform="rotate(-18 60 200)" font-size="50">T</text>
+          <text class="leaf-letter l-T" x="63" y="198" transform="rotate(-18 63 198)" font-size="34">T</text>
         </g>
 
         <!-- ============ FLOR ============ -->
@@ -599,7 +573,7 @@
                 stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.55"/>
           <path d="M 138 470 Q 162 450, 188 425 M 152 425 Q 175 408, 195 388 M 165 388 Q 182 376, 198 358"
                 stroke="#0a2614" stroke-width="0.6" fill="none" opacity="0.4"/>
-          <text class="leaf-letter l-H" x="158" y="412" transform="rotate(28 158 412)" font-size="60">H</text>
+          <text class="leaf-letter l-H" x="163" y="408" transform="rotate(28 163 408)" font-size="40">H</text>
         </g>
 
         <!-- HOJA INFERIOR IZQUIERDA con E -->
@@ -614,7 +588,7 @@
                 stroke="#0a2614" stroke-width="1" fill="none" opacity="0.5"/>
           <path d="M 95 425 Q 75 412, 55 397 M 85 390 Q 65 378, 48 365"
                 stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
-          <text class="leaf-letter l-E1" x="55" y="385" transform="rotate(-22 55 385)" font-size="56">E</text>
+          <text class="leaf-letter l-E1" x="58" y="382" transform="rotate(-22 58 382)" font-size="36">E</text>
         </g>
 
         <!-- HOJA SUPERIOR IZQUIERDA con R -->
@@ -627,7 +601,7 @@
                 fill="url(#leaf2)" stroke="#0a2614" stroke-width="1.2"/>
           <path d="M 120 280 Q 88 240, 68 200 Q 58 180, 55 162"
                 stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
-          <text class="leaf-letter l-R" x="60" y="225" transform="rotate(-22 60 225)" font-size="52">R</text>
+          <text class="leaf-letter l-R" x="63" y="222" transform="rotate(-22 63 222)" font-size="34">R</text>
         </g>
 
         <!-- ============ FLOR ============ -->
@@ -726,7 +700,7 @@
                 stroke="#0a2614" stroke-width="1.2" fill="none" opacity="0.55"/>
           <path d="M 138 450 Q 160 432, 185 410 M 152 410 Q 172 395, 192 378"
                 stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.4"/>
-          <text class="leaf-letter l-I" x="170" y="395" transform="rotate(28 170 395)" font-size="56">I</text>
+          <text class="leaf-letter l-I" x="173" y="392" transform="rotate(28 173 392)" font-size="36">I</text>
         </g>
 
         <!-- HOJA MEDIANA IZQUIERDA con N -->
@@ -741,7 +715,7 @@
                 stroke="#0a2614" stroke-width="1" fill="none" opacity="0.5"/>
           <path d="M 95 350 Q 75 340, 55 325 M 85 320 Q 65 310, 48 298"
                 stroke="#0a2614" stroke-width="0.5" fill="none" opacity="0.35"/>
-          <text class="leaf-letter l-N" x="45" y="305" transform="rotate(-22 45 305)" font-size="56">N</text>
+          <text class="leaf-letter l-N" x="48" y="302" transform="rotate(-22 48 302)" font-size="36">N</text>
         </g>
 
         <!-- HOJA PEQUEÑA SUPERIOR DERECHA con E -->
@@ -754,7 +728,7 @@
                 fill="url(#leaf3b)" stroke="#0a2614" stroke-width="1.2"/>
           <path d="M 120 250 Q 145 215, 165 175 Q 175 158, 170 142"
                 stroke="#0a2614" stroke-width="0.8" fill="none" opacity="0.5"/>
-          <text class="leaf-letter l-E2" x="138" y="200" transform="rotate(22 138 200)" font-size="50">E</text>
+          <text class="leaf-letter l-E2" x="141" y="197" transform="rotate(22 141 197)" font-size="34">E</text>
         </g>
 
         <!-- ============ FLOR ============ -->
@@ -795,6 +769,8 @@
     </div>
 
   </div>
+
+  <div id="lilies-container"></div>
 
   <div class="hint">✦  un jardín bajo las estrellas  ✦</div>
 
@@ -861,6 +837,96 @@
     }
     setInterval(createShootingStar, 4500);
     setTimeout(createShootingStar, 1500);
+
+    (function createGroundLilies() {
+      const container = document.getElementById('lilies-container');
+      const ns = 'http://www.w3.org/2000/svg';
+      const palettes = [
+        ['#ff69b4','#ff1493','#ffb6c1'],
+        ['#4169e1','#6495ed','#87ceeb'],
+        ['#dc143c','#e63946','#ff4500'],
+        ['#9370db','#da70d6','#ba55d3'],
+        ['#ff6347','#ffa07a','#ff8c69'],
+        ['#ffffff','#ffe4e1','#fff0f5'],
+      ];
+      const allColors = palettes.flat();
+
+      for (let i = 0; i < 110; i++) {
+        const x    = Math.random() * 100;
+        const y    = Math.random() * 85 + 3;
+        const size = 5 + Math.random() * 11;
+        const color = allColors[Math.floor(Math.random() * allColors.length)];
+        const numP  = 5 + Math.floor(Math.random() * 2);
+        const rot   = Math.random() * 360;
+        const delay = 7 + Math.random() * 4;
+        const hl    = size * 0.58;
+        const pw    = size * 0.26;
+        const vs    = size * 2.6;
+
+        const wrap = document.createElement('div');
+        wrap.style.cssText =
+          `position:absolute;left:${x}%;bottom:${y}%;` +
+          `transform:translate(-50%,50%);width:${vs}px;height:${vs}px;`;
+
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('width', vs);
+        svg.setAttribute('height', vs);
+        svg.setAttribute('viewBox', `${-vs/2} ${-vs/2} ${vs} ${vs}`);
+        svg.style.cssText =
+          `display:block;overflow:visible;` +
+          `animation:lilyAppear 1.2s ease-out ${delay}s both;`;
+
+        const g = document.createElementNS(ns, 'g');
+        g.setAttribute('transform', `rotate(${rot})`);
+
+        for (let p = 0; p < numP; p++) {
+          const ang = (p / numP) * 360;
+          const pg = document.createElementNS(ns, 'g');
+          pg.setAttribute('transform', `rotate(${ang})`);
+          const petal = document.createElementNS(ns, 'ellipse');
+          petal.setAttribute('cx', '0');
+          petal.setAttribute('cy', -hl);
+          petal.setAttribute('rx', pw);
+          petal.setAttribute('ry', hl);
+          petal.setAttribute('fill', color);
+          petal.setAttribute('opacity', '0.9');
+          pg.appendChild(petal);
+          g.appendChild(pg);
+        }
+
+        /* Estambres visibles desde el interior */
+        const stamenCount = numP;
+        for (let s = 0; s < stamenCount; s++) {
+          const ang = (s / stamenCount) * 360 + 180 / stamenCount;
+          const sg = document.createElementNS(ns, 'g');
+          sg.setAttribute('transform', `rotate(${ang})`);
+          const stamen = document.createElementNS(ns, 'line');
+          stamen.setAttribute('x1', '0'); stamen.setAttribute('y1', '0');
+          stamen.setAttribute('x2', '0'); stamen.setAttribute('y2', -(hl * 0.55));
+          stamen.setAttribute('stroke', '#ffd700');
+          stamen.setAttribute('stroke-width', pw * 0.35);
+          stamen.setAttribute('stroke-linecap', 'round');
+          const tip = document.createElementNS(ns, 'circle');
+          tip.setAttribute('cx', '0'); tip.setAttribute('cy', -(hl * 0.55));
+          tip.setAttribute('r', pw * 0.45); tip.setAttribute('fill', '#fff176');
+          sg.appendChild(stamen); sg.appendChild(tip);
+          g.appendChild(sg);
+        }
+
+        const center = document.createElementNS(ns, 'circle');
+        center.setAttribute('cx', '0'); center.setAttribute('cy', '0');
+        center.setAttribute('r', size * 0.28); center.setAttribute('fill', '#fff9c4');
+        const dot = document.createElementNS(ns, 'circle');
+        dot.setAttribute('cx', '0'); dot.setAttribute('cy', '0');
+        dot.setAttribute('r', size * 0.13); dot.setAttribute('fill', '#ffca28');
+
+        g.appendChild(center);
+        g.appendChild(dot);
+        svg.appendChild(g);
+        wrap.appendChild(svg);
+        container.appendChild(wrap);
+      }
+    })();
 
     (function createFireflies() {
       const count = 12;
