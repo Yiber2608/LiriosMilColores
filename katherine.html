@@ -18,7 +18,8 @@
       --tulip-yellow-bright: #fff4a8;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :focus { outline: none; }
 
     html, body {
       width: 100%;
@@ -138,17 +139,19 @@
 
     .soil-mound {
       position: fixed;
-      bottom: -10px;
+      bottom: -24px;
       left: 50%;
       transform: translateX(-50%);
-      width: 70%;
-      max-width: 900px;
-      height: 90px;
-      background: radial-gradient(ellipse at 50% 100%, #2a1810 0%, #1a0e08 40%, transparent 70%);
+      width: 92%;
+      max-width: 1300px;
+      height: 130px;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(58, 40, 24, 0.5) 0%, rgba(30, 22, 13, 0.3) 46%, transparent 72%),
+        radial-gradient(ellipse at 50% 100%, rgba(18, 34, 22, 0.55) 0%, transparent 78%);
       border-radius: 50% 50% 0 0 / 100% 100% 0 0;
       z-index: 6;
       pointer-events: none;
-      filter: blur(2px);
+      filter: blur(12px);
     }
 
     .grass-blade {
@@ -190,15 +193,15 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 40px;
+      gap: 52px;
       z-index: 10;
       pointer-events: none;
     }
 
     .tulip {
       position: relative;
-      width: 240px;
-      height: 75vh;
+      width: 300px;
+      height: 78vh;
       transform-origin: bottom center;
       transform: scaleY(0.02) scaleX(0.3);
       opacity: 0;
@@ -296,32 +299,8 @@
       50% { opacity: 0.8; }
     }
 
-    /* ===== LETRAS OCULTAS EN LAS HOJAS ===== */
-    .leaf-letter {
-      font-family: 'Great Vibes', 'Italianno', cursive;
-      fill: rgba(255, 244, 168, 0.55);
-      font-weight: 400;
-      opacity: 0;
-      animation: letterAppear 2s ease-out forwards;
-      paint-order: stroke fill;
-      stroke: rgba(20, 60, 30, 0.4);
-      stroke-width: 0.5;
-    }
-    @keyframes letterAppear {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    /* Delays para que aparezcan en orden K-A-T-H-E-R-I-N-E después del brote */
-    .l-K { animation-delay: 5.5s; }
-    .l-A { animation-delay: 5.8s; }
-    .l-T { animation-delay: 6.1s; }
-    .l-H { animation-delay: 6.4s; }
-    .l-E1 { animation-delay: 6.7s; }
-    .l-R { animation-delay: 7.0s; }
-    .l-I { animation-delay: 7.3s; }
-    .l-N { animation-delay: 7.6s; }
-    .l-E2 { animation-delay: 7.9s; }
+    /* Letras ocultas removidas (ya no se muestran en las hojas) */
+    .leaf-letter { display: none; }
 
     /* Luciérnagas */
     .firefly {
@@ -364,13 +343,281 @@
     }
 
     /* ===== Tulipanes interactivos ===== */
-    .tulip { cursor: pointer; pointer-events: auto; }
-    .tulip svg { transition: filter 0.4s ease; }
+    /* click preciso: solo las formas reales de la flor, no toda la columna */
+    .tulip { pointer-events: none; }
+    .tulip svg { transition: filter 0.4s ease; pointer-events: none; }
+    .tulip svg > * { pointer-events: auto; cursor: pointer; }
+    .tulip .flower-aura { pointer-events: none; }
     .tulip:hover svg {
       filter: drop-shadow(0 0 18px rgba(255,220,100,0.55)) drop-shadow(0 10px 25px rgba(0,0,0,0.6));
     }
     .tulip.active svg {
       filter: drop-shadow(0 0 34px rgba(255,210,60,0.9)) drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+    }
+
+    /* ===== Aura luminosa de cada flor ===== */
+    .flower-aura {
+      transform-box: fill-box;
+      transform-origin: center;
+      mix-blend-mode: screen;
+      animation: auraPulse 5s ease-in-out infinite;
+    }
+    @keyframes auraPulse {
+      0%, 100% { opacity: 0.5;  transform: scale(1); }
+      50%      { opacity: 0.95; transform: scale(1.16); }
+    }
+    .tulip.t2 .flower-aura { animation-delay: 0.6s; }
+    .tulip.t3 .flower-aura { animation-delay: 1.1s; }
+    .tulip.active .flower-aura { animation-duration: 2.6s; }
+
+    /* ===== Estallido de pétalos al tocar una flor ===== */
+    .burst-petal {
+      position: fixed;
+      border-radius: 50% 50% 50% 0;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    /* ===== Pétalos flotando (ambiente permanente) ===== */
+    .ambient-petal {
+      position: fixed;
+      z-index: 14;
+      pointer-events: none;
+      border-radius: 50% 50% 50% 0;
+      box-shadow: 0 0 6px rgba(255, 220, 150, 0.35);
+    }
+
+    /* ===== Relámpago (modo lluvia) ===== */
+    .lightning {
+      position: fixed; inset: 0;
+      background: #dbe9ff;
+      opacity: 0;
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    /* ===== Disco de lirios locos ===== */
+    .disco {
+      position: fixed; inset: 0;
+      z-index: 9;
+      opacity: 0;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    body.lilies-crazy .disco { animation: disco 0.5s steps(1) infinite; }
+    @keyframes disco {
+      0%   { opacity: 0.16; background: radial-gradient(circle at 28% 38%, #ff1493, transparent 55%); }
+      33%  { opacity: 0.16; background: radial-gradient(circle at 72% 30%, #00e5ff, transparent 55%); }
+      66%  { opacity: 0.16; background: radial-gradient(circle at 50% 72%, #76ff03, transparent 55%); }
+      100% { opacity: 0.16; background: radial-gradient(circle at 28% 38%, #ff1493, transparent 55%); }
+    }
+    body.lilies-crazy #lilies-container {
+      transform-origin: 50% 100%;
+      animation: gardenThrob 0.85s ease-in-out infinite;
+    }
+    @keyframes gardenThrob {
+      0%, 100% { transform: scale(1);    filter: hue-rotate(0deg)  saturate(1.4) brightness(1.1); }
+      50%      { transform: scale(1.07); filter: hue-rotate(70deg) saturate(2)   brightness(1.35); }
+    }
+
+    /* ===== Colibríes secretos ===== */
+    .colibri {
+      position: fixed;
+      z-index: 16;
+      width: 110px; height: 84px;
+      pointer-events: none;              /* el área de click precisa la dan las formas del SVG */
+      -webkit-user-select: none;
+      user-select: none;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+      animation: birdFly 28s ease-in-out infinite;
+      transition: filter 0.4s ease, opacity 1.2s ease;
+    }
+    .colibri svg > * { pointer-events: auto; cursor: pointer; }
+    .colibri:hover {
+      filter: drop-shadow(0 0 15px rgba(180,220,255,0.8)) drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+    }
+    /* saludo solo del pajarito principal */
+    .colibri-hint {
+      position: absolute;
+      top: -24px; left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.35rem;
+      color: rgba(255, 244, 200, 0.92);
+      text-shadow: 0 0 12px rgba(255, 220, 120, 0.6);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .colibri.main-bird .colibri-hint { animation: hintBreathe 3.6s ease-in-out infinite; }
+    @keyframes hintBreathe { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.9; } }
+    /* bandada: oculta (.pre) hasta que se elige el ánimo */
+    .colibri.pre { opacity: 0 !important; }
+    .colibri.pre svg > * { pointer-events: none; cursor: default; }
+    @keyframes birdFly {
+      0%   { transform: translate(0, 0)              rotate(-3deg); }
+      15%  { transform: translate(24vw, -7vh)        rotate(3deg); }
+      30%  { transform: translate(48vw, 5vh)         rotate(-2deg); }
+      48%  { transform: translate(72vw, -9vh)        rotate(4deg); }
+      52%  { transform: translate(72vw, -9vh) scaleX(-1) rotate(-4deg); }
+      66%  { transform: translate(50vw, 6vh)  scaleX(-1) rotate(3deg); }
+      82%  { transform: translate(24vw, -5vh) scaleX(-1) rotate(-3deg); }
+      99%  { transform: translate(0, 0)       scaleX(-1) rotate(3deg); }
+      100% { transform: translate(0, 0)              rotate(-3deg); }
+    }
+    .colibri svg { width: 100%; height: 100%; overflow: visible; display: block; pointer-events: none; }
+    .colibri .wing {
+      transform-box: fill-box;
+      transform-origin: 22% 34%;
+      animation: flap 0.09s ease-in-out infinite alternate;
+    }
+    @keyframes flap {
+      from { transform: rotate(-30deg) scaleY(0.82); }
+      to   { transform: rotate(36deg)  scaleY(1.06); }
+    }
+    /* el pajarito principal NO se voltea, para que "hola pajarito" no salga al revés */
+    @keyframes birdFlyNoFlip {
+      0%   { transform: translate(0, 0)       rotate(-3deg); }
+      15%  { transform: translate(24vw, -7vh) rotate(3deg); }
+      30%  { transform: translate(48vw, 5vh)  rotate(-2deg); }
+      48%  { transform: translate(66vw, -9vh) rotate(4deg); }
+      66%  { transform: translate(44vw, 6vh)  rotate(3deg); }
+      82%  { transform: translate(20vw, -5vh) rotate(-3deg); }
+      100% { transform: translate(0, 0)       rotate(-3deg); }
+    }
+    .colibri.main-bird { animation-name: birdFlyNoFlip; }
+    /* ===== Revelación oculta y melancólica ===== */
+    .reveal-veil {
+      position: fixed; inset: 0;
+      z-index: 18;
+      background: radial-gradient(ellipse at 50% 38%, rgba(12,20,48,0.30) 0%, rgba(3,5,14,0.88) 78%);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2.6s ease;
+    }
+    body.bird-reveal .reveal-veil { opacity: 1; pointer-events: auto; cursor: pointer; }
+
+    .reveal-star {
+      position: fixed;
+      z-index: 19;
+      top: 26%; left: 50%;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #fffbe8;
+      box-shadow: 0 0 22px #fff, 0 0 60px #ffe9a8, 0 0 130px rgba(255,210,120,0.6);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+      pointer-events: none;
+      transition: opacity 1.6s ease;
+    }
+    .reveal-star::before, .reveal-star::after {
+      content: '';
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(currentColor, transparent);
+      color: rgba(255, 240, 200, 0.85);
+    }
+    .reveal-star::before { width: 2px;  height: 190px; background: linear-gradient(transparent, #fff6d8, transparent); }
+    .reveal-star::after  { width: 190px; height: 2px; background: linear-gradient(90deg, transparent, #fff6d8, transparent); }
+    body.bird-reveal .reveal-star { animation: starRise 6s ease-out forwards; }
+    @keyframes starRise {
+      0%   { opacity: 0; transform: translate(-50%, 42vh) scale(0.2) rotate(0deg); }
+      25%  { opacity: 1; }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+    }
+
+    .reveal-text {
+      position: fixed;
+      z-index: 20;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(92vw, 780px);
+      text-align: center;
+      pointer-events: none;
+    }
+    .reveal-text .rt-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.05rem, 2.7vw, 1.65rem);
+      line-height: 1.65;
+      color: rgba(240, 236, 220, 0.96);
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 22px rgba(140, 170, 235, 0.45);
+      opacity: 0;
+      transform: translateY(18px);
+      margin: 0;
+      transition: opacity 1.6s ease;
+    }
+    body.bird-reveal .reveal-text .rt-main { animation: lineIn 3s ease-out 1.1s forwards; }
+    @keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
+
+    body.bird-reveal .colibri {
+      animation-play-state: paused;
+      opacity: 0.22;
+      transition: opacity 1s ease;
+    }
+    body.bird-reveal .colibri.bird-active {
+      opacity: 1;
+      z-index: 19;
+      filter: drop-shadow(0 0 22px rgba(180, 210, 255, 0.9)) drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+    }
+    body.bird-reveal .colibri .wing { animation-duration: 0.5s; }
+    body.bird-reveal .hint { opacity: 0 !important; }
+
+    .stardust {
+      position: fixed;
+      z-index: 20;
+      pointer-events: none;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ===== Selector de ánimo (dos huevos con pollitos) ===== */
+    .mood-chooser {
+      position: fixed;
+      z-index: 22;
+      left: 50%; top: 61%;
+      transform: translateX(-50%);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    .mood-chooser.show { opacity: 1; pointer-events: auto; }
+    .mood-q {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+      color: rgba(255, 244, 200, 0.95);
+      text-shadow: 0 0 16px rgba(255, 220, 130, 0.5);
+      margin-bottom: 14px;
+    }
+    .mood-eggs { display: flex; gap: 46px; justify-content: center; }
+    .egg-btn {
+      background: none; border: none; outline: none; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+    .egg-btn svg { width: 88px; height: 100px; display: block; }
+    .egg-btn span {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 1.05rem; letter-spacing: 0.1em;
+      color: rgba(233, 228, 208, 0.85);
+    }
+    .egg-btn:hover { transform: translateY(-6px) scale(1.06); filter: drop-shadow(0 0 18px rgba(255, 220, 140, 0.65)); }
+    .egg-btn .chick {
+      transform-box: fill-box; transform-origin: 50% 90%;
+      animation: chickBob 1.7s ease-in-out infinite;
+    }
+    .egg-btn[data-mood="triste"] .chick { animation-duration: 2.4s; }
+    @keyframes chickBob {
+      0%, 100% { transform: translateY(0) rotate(-2.5deg); }
+      50%      { transform: translateY(-4px) rotate(2.5deg); }
     }
 
     /* ===== Modo día ===== */
@@ -432,8 +679,8 @@
     }
 
     @media (max-width: 768px) {
-      .tulips-stage { gap: 5px; }
-      .tulip { width: 130px; }
+      .tulips-stage { gap: 8px; }
+      .tulip { width: 165px; }
       .moon { width: 70px; height: 70px; top: 5%; right: 8%; }
     }
   </style>
@@ -450,6 +697,8 @@
 
   <canvas id="particles-canvas"></canvas>
   <canvas id="rain-canvas"></canvas>
+  <div class="lightning"></div>
+  <div class="disco"></div>
 
   <div class="ground"></div>
   <div class="soil-mound"></div>
@@ -466,19 +715,22 @@
       <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
         <defs>
           <linearGradient id="petal1" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#fff4a8"/>
-            <stop offset="35%" stop-color="#ffe066"/>
-            <stop offset="70%" stop-color="#f5c518"/>
-            <stop offset="100%" stop-color="#c98a05"/>
+            <stop offset="0%" stop-color="#fffdf0"/>
+            <stop offset="16%" stop-color="#fff3a2"/>
+            <stop offset="40%" stop-color="#ffe066"/>
+            <stop offset="66%" stop-color="#f7c81e"/>
+            <stop offset="86%" stop-color="#e09a06"/>
+            <stop offset="100%" stop-color="#a86a03"/>
           </linearGradient>
           <linearGradient id="petalShadow1" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
             <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
             <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
           </linearGradient>
-          <radialGradient id="petalHighlight1" cx="50%" cy="30%" r="60%">
-            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.85"/>
-            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          <radialGradient id="petalHighlight1" cx="50%" cy="26%" r="62%">
+            <stop offset="0%" stop-color="#fffef7" stop-opacity="0.95"/>
+            <stop offset="42%" stop-color="#fff3bd" stop-opacity="0.38"/>
+            <stop offset="100%" stop-color="#fff4a8" stop-opacity="0"/>
           </radialGradient>
           <linearGradient id="stem1" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#0a2614"/>
@@ -497,6 +749,11 @@
             <stop offset="100%" stop-color="#0a2614"/>
           </linearGradient>
           <filter id="softShadow1"><feGaussianBlur stdDeviation="4"/></filter>
+          <radialGradient id="bloomAura1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff2b0" stop-opacity="0.55"/>
+            <stop offset="45%" stop-color="#ffcf5c" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#ffcf5c" stop-opacity="0"/>
+          </radialGradient>
         </defs>
 
         <!-- TALLO -->
@@ -550,7 +807,8 @@
         </g>
 
         <!-- ============ FLOR ============ -->
-        <g transform="translate(120, 130)">
+        <g class="flower-head" transform="translate(120, 130) scale(1.14)">
+          <ellipse class="flower-aura" cx="0" cy="-72" rx="86" ry="118" fill="url(#bloomAura1)"/>
           <ellipse cx="0" cy="5" rx="42" ry="8" fill="#000" opacity="0.25" filter="url(#softShadow1)"/>
 
           <path d="M -38 0 C -50 -25, -55 -65, -45 -100 C -38 -125, -22 -135, -5 -130 C -8 -90, -12 -45, -10 0 Z"
@@ -593,19 +851,22 @@
       <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
         <defs>
           <linearGradient id="petal2" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#fff4a8"/>
-            <stop offset="35%" stop-color="#ffe066"/>
-            <stop offset="70%" stop-color="#f5c518"/>
-            <stop offset="100%" stop-color="#c98a05"/>
+            <stop offset="0%" stop-color="#fffdf0"/>
+            <stop offset="16%" stop-color="#fff3a2"/>
+            <stop offset="40%" stop-color="#ffe066"/>
+            <stop offset="66%" stop-color="#f7c81e"/>
+            <stop offset="86%" stop-color="#e09a06"/>
+            <stop offset="100%" stop-color="#a86a03"/>
           </linearGradient>
           <linearGradient id="petalShadow2" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
             <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
             <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
           </linearGradient>
-          <radialGradient id="petalHighlight2" cx="50%" cy="30%" r="60%">
-            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.9"/>
-            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          <radialGradient id="petalHighlight2" cx="50%" cy="26%" r="62%">
+            <stop offset="0%" stop-color="#fffef7" stop-opacity="0.98"/>
+            <stop offset="42%" stop-color="#fff3bd" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#fff4a8" stop-opacity="0"/>
           </radialGradient>
           <linearGradient id="stem2" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#0a2614"/>
@@ -624,6 +885,11 @@
             <stop offset="100%" stop-color="#0a2614"/>
           </linearGradient>
           <filter id="softShadow2"><feGaussianBlur stdDeviation="4"/></filter>
+          <radialGradient id="bloomAura2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff2b0" stop-opacity="0.6"/>
+            <stop offset="45%" stop-color="#ffcf5c" stop-opacity="0.24"/>
+            <stop offset="100%" stop-color="#ffcf5c" stop-opacity="0"/>
+          </radialGradient>
         </defs>
 
         <path d="M 120 700 Q 123 500, 120 350 Q 117 220, 120 110"
@@ -676,7 +942,8 @@
         </g>
 
         <!-- ============ FLOR ============ -->
-        <g transform="translate(120, 110)">
+        <g class="flower-head" transform="translate(120, 110) scale(1.15)">
+          <ellipse class="flower-aura" cx="0" cy="-80" rx="94" ry="130" fill="url(#bloomAura2)"/>
           <ellipse cx="0" cy="5" rx="46" ry="9" fill="#000" opacity="0.3" filter="url(#softShadow2)"/>
 
           <path d="M -42 5 C -55 -28, -62 -72, -50 -110 C -42 -138, -25 -148, -5 -143 C -8 -100, -13 -50, -10 5 Z"
@@ -720,19 +987,22 @@
       <svg viewBox="0 0 240 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
         <defs>
           <linearGradient id="petal3" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#fff4a8"/>
-            <stop offset="35%" stop-color="#ffe066"/>
-            <stop offset="70%" stop-color="#f5c518"/>
-            <stop offset="100%" stop-color="#c98a05"/>
+            <stop offset="0%" stop-color="#fffdf0"/>
+            <stop offset="16%" stop-color="#fff3a2"/>
+            <stop offset="40%" stop-color="#ffe066"/>
+            <stop offset="66%" stop-color="#f7c81e"/>
+            <stop offset="86%" stop-color="#e09a06"/>
+            <stop offset="100%" stop-color="#a86a03"/>
           </linearGradient>
           <linearGradient id="petalShadow3" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#a87405" stop-opacity="0.7"/>
             <stop offset="50%" stop-color="#d49c0a" stop-opacity="0.2"/>
             <stop offset="100%" stop-color="#a87405" stop-opacity="0.7"/>
           </linearGradient>
-          <radialGradient id="petalHighlight3" cx="50%" cy="30%" r="60%">
-            <stop offset="0%" stop-color="#fffae0" stop-opacity="0.85"/>
-            <stop offset="60%" stop-color="#fff4a8" stop-opacity="0"/>
+          <radialGradient id="petalHighlight3" cx="50%" cy="26%" r="62%">
+            <stop offset="0%" stop-color="#fffef7" stop-opacity="0.95"/>
+            <stop offset="42%" stop-color="#fff3bd" stop-opacity="0.38"/>
+            <stop offset="100%" stop-color="#fff4a8" stop-opacity="0"/>
           </radialGradient>
           <linearGradient id="stem3" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#0a2614"/>
@@ -751,6 +1021,11 @@
             <stop offset="100%" stop-color="#0a2614"/>
           </linearGradient>
           <filter id="softShadow3"><feGaussianBlur stdDeviation="4"/></filter>
+          <radialGradient id="bloomAura3" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff2b0" stop-opacity="0.55"/>
+            <stop offset="45%" stop-color="#ffcf5c" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#ffcf5c" stop-opacity="0"/>
+          </radialGradient>
         </defs>
 
         <path d="M 120 700 Q 125 500, 122 350 Q 118 220, 120 130"
@@ -803,7 +1078,8 @@
         </g>
 
         <!-- ============ FLOR ============ -->
-        <g transform="translate(120, 130)">
+        <g class="flower-head" transform="translate(120, 130) scale(1.14)">
+          <ellipse class="flower-aura" cx="0" cy="-70" rx="84" ry="114" fill="url(#bloomAura3)"/>
           <ellipse cx="0" cy="5" rx="40" ry="8" fill="#000" opacity="0.25" filter="url(#softShadow3)"/>
 
           <path d="M -36 0 C -48 -25, -53 -62, -43 -98 C -36 -123, -20 -132, -3 -128 C -6 -88, -10 -42, -8 0 Z"
@@ -842,6 +1118,84 @@
   </div>
 
   <div id="lilies-container"></div>
+
+  <!-- Definiciones compartidas del colibrí (los pajaritos se crean por JS) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="birdBody" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#8fe8d6"/>
+        <stop offset="45%"  stop-color="#31b6a4"/>
+        <stop offset="80%"  stop-color="#2a86b8"/>
+        <stop offset="100%" stop-color="#3f5aa6"/>
+      </linearGradient>
+      <linearGradient id="birdBelly" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="#eafbf6"/>
+        <stop offset="100%" stop-color="#a9d9d2"/>
+      </linearGradient>
+      <linearGradient id="birdWing" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#bfeff0" stop-opacity="0.95"/>
+        <stop offset="60%"  stop-color="#5ec8d8" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#8a6cff" stop-opacity="0.5"/>
+      </linearGradient>
+      <linearGradient id="birdThroat" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="#ff6d8f"/>
+        <stop offset="100%" stop-color="#c81d5a"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Revelación oculta y melancólica -->
+  <div class="reveal-veil"></div>
+  <div class="reveal-star"></div>
+  <div class="reveal-text">
+    <p class="rt-main"></p>
+  </div>
+
+  <!-- Selector de ánimo: dos huevos con pollitos -->
+  <div class="mood-chooser" id="mood-chooser">
+    <p class="mood-q">¿cómo estás?</p>
+    <div class="mood-eggs">
+      <button class="egg-btn" data-mood="bien" aria-label="Estoy bien">
+        <svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+          <g class="chick">
+            <ellipse cx="50" cy="50" rx="30" ry="30" fill="#ffd24a"/>
+            <path d="M 50 22 q -5 -11 2 -15 q 1 8 8 10 q -6 1 -10 5 z" fill="#ffc21a"/>
+            <path d="M 25 52 q -9 6 -3 17 q 9 -2 13 -11 z" fill="#ffc21a"/>
+            <circle cx="42" cy="45" r="3.6" fill="#2a2118"/>
+            <circle cx="58" cy="45" r="3.6" fill="#2a2118"/>
+            <circle cx="43.2" cy="43.8" r="1.1" fill="#fff"/>
+            <circle cx="59.2" cy="43.8" r="1.1" fill="#fff"/>
+            <circle cx="34" cy="53" r="4.2" fill="#ff9db0" opacity="0.6"/>
+            <circle cx="66" cy="53" r="4.2" fill="#ff9db0" opacity="0.6"/>
+            <path d="M 46 51 L 54 51 L 50 58 Z" fill="#ff8c2b"/>
+            <path d="M 43 61 q 7 7 14 0" stroke="#2a2118" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          </g>
+          <path d="M 20 64 Q 18 98, 50 102 Q 82 98, 80 64 L 71 71 L 62 62 L 53 71 L 44 62 L 35 71 L 26 62 Z"
+                fill="#fbf3dc" stroke="#e6d9b0" stroke-width="1.5"/>
+        </svg>
+        <span>bien</span>
+      </button>
+      <button class="egg-btn" data-mood="triste" aria-label="Estoy triste">
+        <svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+          <g class="chick">
+            <ellipse cx="50" cy="50" rx="30" ry="30" fill="#ffd24a"/>
+            <path d="M 50 22 q -7 -6 -3 -13 q 5 6 11 5 q -6 3 -8 8 z" fill="#ffc21a"/>
+            <path d="M 25 55 q -9 4 -5 15 q 9 -2 13 -9 z" fill="#ffc21a"/>
+            <circle cx="42" cy="47" r="3.6" fill="#2a2118"/>
+            <circle cx="58" cy="47" r="3.6" fill="#2a2118"/>
+            <path d="M 37 42 q 5 -3 9 0" stroke="#2a2118" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M 54 42 q 5 -3 9 0" stroke="#2a2118" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M 46 52 L 54 52 L 50 59 Z" fill="#ff8c2b"/>
+            <path d="M 43 66 q 7 -7 14 0" stroke="#2a2118" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M 64 50 q 3.5 7 0 10 q -3.5 -3 0 -10 z" fill="#7fc7ff"/>
+          </g>
+          <path d="M 20 64 Q 18 98, 50 102 Q 82 98, 80 64 L 71 71 L 62 62 L 53 71 L 44 62 L 35 71 L 26 62 Z"
+                fill="#fbf3dc" stroke="#e6d9b0" stroke-width="1.5"/>
+        </svg>
+        <span>triste</span>
+      </button>
+    </div>
+  </div>
 
   <div class="hint">✦  un jardín bajo las estrellas  ✦</div>
 
@@ -1039,9 +1393,9 @@
        AUDIO
     ============================================================ */
     const songs = {
-      t1: new Audio('until-i-found-you.mp3'),
-      t2: new Audio('ufio-oblivion.mp3'),
-      t3: new Audio('beethoven-fr-elise.mp3')
+      t1: new Audio('Music/until-i-found-you.mp3'),            // modo día
+      t2: new Audio('Music/guns-n-roses-dont-cry.mp3'),        // lluvia — "Don't Cry"
+      t3: new Audio('Music/the-turtles-happy-together.mp3')    // lirios locos — alegre/colorido
     };
     Object.values(songs).forEach(a => { a.loop = true; a.volume = 0.55; });
 
@@ -1054,10 +1408,13 @@
         return;
       }
       if (activeMode) stopMode(activeMode);
+      if (currentBird) closeBird();   // cierra un pajarito si estaba abierto
+      hideChooser();
       activeMode = mode;
       songs[mode].currentTime = 0;
       songs[mode].play().catch(() => {});
-      document.querySelector('.tulip.' + mode).classList.add('active');
+      const tulipEl = document.querySelector('.tulip.' + mode);
+      if (tulipEl) { tulipEl.classList.add('active'); celebrationBurst(mode); }
       if (mode === 't1') enableDay();
       if (mode === 't2') enableRain();
       if (mode === 't3') enableCrazyLilies();
@@ -1066,7 +1423,8 @@
     function stopMode(mode) {
       songs[mode].pause();
       songs[mode].currentTime = 0;
-      document.querySelector('.tulip.' + mode).classList.remove('active');
+      const tulipEl = document.querySelector('.tulip.' + mode);
+      if (tulipEl) tulipEl.classList.remove('active');
       if (mode === 't1') disableDay();
       if (mode === 't2') disableRain();
       if (mode === 't3') disableCrazyLilies();
@@ -1102,6 +1460,27 @@
         w:    0.8 + Math.random() * 0.8
       }));
       animateRain();
+      scheduleLightning();
+    }
+
+    /* Relámpagos que iluminan la escena durante la lluvia */
+    const lightningEl = document.querySelector('.lightning');
+    let lightningTimer = null;
+    function scheduleLightning() {
+      lightningTimer = setTimeout(() => {
+        flashLightning();
+        scheduleLightning();
+      }, 3500 + Math.random() * 6500);
+    }
+    function flashLightning() {
+      lightningEl.animate([
+        { opacity: 0 },
+        { opacity: 0.7,  offset: 0.04 },
+        { opacity: 0.1,  offset: 0.1 },
+        { opacity: 0.55, offset: 0.16 },
+        { opacity: 0,    offset: 0.45 },
+        { opacity: 0 }
+      ], { duration: 1200, easing: 'ease-out' });
     }
 
     function animateRain() {
@@ -1124,6 +1503,8 @@
       rainId = null;
       rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
       rainCanvas.style.display = 'none';
+      clearTimeout(lightningTimer);
+      lightningTimer = null;
     }
 
     window.addEventListener('resize', () => {
@@ -1141,6 +1522,7 @@
     let lilyInterval = null;
 
     function enableCrazyLilies() {
+      document.body.classList.add('lilies-crazy');
       lilyInterval = setInterval(() => {
         document.querySelectorAll('.lily-petal').forEach(p => {
           p.setAttribute('fill', crazyColors[Math.floor(Math.random() * crazyColors.length)]);
@@ -1149,11 +1531,344 @@
     }
 
     function disableCrazyLilies() {
+      document.body.classList.remove('lilies-crazy');
       clearInterval(lilyInterval);
       lilyInterval = null;
       document.querySelectorAll('.lily-petal').forEach(p => {
         p.setAttribute('fill', p.dataset.orig);
       });
+    }
+
+    /* ============================================================
+       ESTALLIDO DE PÉTALOS AL TOCAR UNA FLOR
+    ============================================================ */
+    function celebrationBurst(mode) {
+      const el = document.querySelector('.tulip.' + mode);
+      if (!el) return;
+      const r  = el.getBoundingClientRect();
+      const ox = r.left + r.width / 2;
+      const oy = r.top + r.height * 0.16;
+      const palette = ['#fff4a8', '#ffd54a', '#ff8fbf', '#ff5fa2', '#8be9ff', '#b388ff', '#7cff6b', '#ffffff'];
+      for (let i = 0; i < 42; i++) {
+        const p  = document.createElement('div');
+        p.className = 'burst-petal';
+        const c  = palette[Math.floor(Math.random() * palette.length)];
+        const sz = 6 + Math.random() * 12;
+        p.style.left = ox + 'px';
+        p.style.top  = oy + 'px';
+        p.style.width  = sz + 'px';
+        p.style.height = sz + 'px';
+        p.style.background = c;
+        p.style.boxShadow  = '0 0 ' + (sz * 0.9) + 'px ' + c;
+        document.body.appendChild(p);
+        const ang  = Math.random() * Math.PI * 2;
+        const dist = 100 + Math.random() * 260;
+        const dx   = Math.cos(ang) * dist;
+        const dy   = Math.sin(ang) * dist - 80;
+        const rot  = Math.random() * 720 - 360;
+        p.animate([
+          { transform: 'translate(-50%,-50%) rotate(0deg) scale(1)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot}deg) scale(0.25)`, opacity: 0 }
+        ], { duration: 1100 + Math.random() * 800, easing: 'cubic-bezier(0.15,0.75,0.3,1)' })
+         .onfinish = () => p.remove();
+      }
+    }
+
+    /* ============================================================
+       PÉTALOS FLOTANDO (AMBIENTE PERMANENTE)
+    ============================================================ */
+    (function ambientPetals() {
+      const tints = ['#fff4a8', '#ffd66a', '#ffc7dd', '#ffffff'];
+      function drop() {
+        const p  = document.createElement('div');
+        p.className = 'ambient-petal';
+        const sz = 6 + Math.random() * 9;
+        p.style.left = (Math.random() * 100) + 'vw';
+        p.style.top  = '-24px';
+        p.style.width  = sz + 'px';
+        p.style.height = (sz * 0.72) + 'px';
+        p.style.background = tints[Math.floor(Math.random() * tints.length)];
+        p.style.opacity = (0.25 + Math.random() * 0.4).toFixed(2);
+        document.body.appendChild(p);
+        const drift = Math.random() * 180 - 90;
+        p.animate([
+          { transform: 'translate(0,0) rotate(0deg)' },
+          { transform: `translate(${drift}px, ${window.innerHeight + 60}px) rotate(${Math.random() * 720 - 360}deg)` }
+        ], { duration: 9000 + Math.random() * 8000, easing: 'linear' })
+         .onfinish = () => p.remove();
+      }
+      setInterval(drop, 850);
+    })();
+
+    /* ============================================================
+       PAJARITOS — principal + bandada + ánimo (pollitos) + frases IA
+    ============================================================ */
+
+    /* ── CONFIG ────────────────────────────────────────────────
+       El pajarito PRINCIPAL (dice "hola pajarito") suena MAIN_SONG
+       y dispara todo. La BANDADA usa una canción por pajarito: sube
+       tus mp3 a esta carpeta y escribe aquí el nombre EXACTO (uno por
+       pajarito). Si hay menos canciones que pajaritos, se reparten. */
+    /* El pajarito PRINCIPAL elige una de estas AL AZAR en cada click */
+    const MAIN_SONGS  = [
+      'Music/mis-ojos-no-podian-ver.mp3',
+      'Music/keane-somewhere-only-we-know.mp3',
+      'Music/orion-cotidianidad.mp3',
+      'Music/los-de-adentro-una-cancion.mp3',
+      'Music/the-cure-boys-dont-cry.mp3'
+    ];
+    /* Una canción por pajarito de la bandada (6) */
+    const BIRD_SONGS  = [
+      'Music/keane-somewhere-only-we-know.mp3',
+      'Music/the-lumineers-ophelia.mp3',
+      'Music/eyes-blue-like-the-atlantic.mp3',
+      'Music/olivia-dean-so-easy.mp3',
+      'Music/ali-gatie-its-you.mp3',
+      'Music/los-pericos-pupilas-lejanas.mp3'
+    ];
+    /* Lista para el auto-avance cuando una canción termina sola */
+    const PLAYLIST = Array.from(new Set(MAIN_SONGS.concat(BIRD_SONGS)));
+    const SONG_LOCK_MS = 60000;   // 1 minuto mínimo antes de que otro click cambie la canción
+    const FLOCK_COUNT = 6;
+
+    /* colores lindos y distintos para cada pajarito de la bandada */
+    const BIRD_TINTS = [
+      'hue-rotate(0deg) saturate(1.05)',     // turquesa (original)
+      'hue-rotate(300deg) saturate(1.15)',   // rosa
+      'hue-rotate(65deg) saturate(1.2)',     // verde
+      'hue-rotate(200deg) saturate(1.1)',    // dorado / ámbar
+      'hue-rotate(120deg) saturate(1.1)',    // azul
+      'hue-rotate(255deg) saturate(1.2)'     // violeta
+    ];
+
+    const MAIN_PHRASE = 'Hola pajarito, ¿cómo estás? Vuelas tanto que ya no te veo… y me alegra tanto: ¡eres feliz!';
+
+    /* Frases de respaldo por estado de ánimo (si /api/frases no responde) */
+    const FALLBACK = {
+      triste: [
+        "Tu presencia ilumina cada instante, y tu bondad se siente como un susurro de paz que envuelve todo a tu alrededor. Sigue cultivando esa fuerza interior que siempre resplandece, cuidándote con la ternura que mereces.",
+        "Tu sonrisa es un faro que disipa cualquier sombra, y tu paciencia brinda refugio a quien la necesita. Que la serenidad que irradias siga guiándote, y que te cuides con la misma delicadeza que das.",
+        "Tu curiosidad abre puertas invisibles y tu creatividad pinta el mundo con colores de esperanza. Mantén esa chispa viva, y permite que el descanso te recargue, porque tu bienestar es la base de tu luz.",
+        "Tu capacidad de escuchar es un regalo que alivia corazones, y tu empatía crea puentes de comprensión. Cuida tu energía como cuidas a los demás, y permite que la calma sea tu compañera constante.",
+        "Tu determinación avanza incluso cuando los vientos soplan en contra, y tu optimismo transforma obstáculos en aprendizajes. Sigue honrando tu camino con la dulzura que te caracteriza, y no olvides nutrirte con momentos de paz.",
+        "Tu energía vibrante contagia alegría, y tu honestidad ilumina cualquier conversación. Permite que el autocuidado sea tan natural como tu risa, y verás cómo tu brillo interior se vuelve aún más sereno.",
+        "Tu resiliencia es un árbol que se mantiene firme bajo cualquier tormenta, y tu generosidad regala esperanza a quienes te rodean. Cuida tus raíces, y sigue floreciendo con la misma gracia.",
+        "Tu mirada refleja un mundo de posibilidades, y tu voz tiene la fuerza de un susurro que calma. Dedica tiempo a escucharte, y verás cómo tu luz interior se vuelve más profunda.",
+        "Tu pasión por lo que haces enciende la inspiración en quienes te observan, y tu humildad te mantiene con los pies firmes. Que cada día te brinde la oportunidad de nutrirte y brillar.",
+        "Tu autenticidad es un faro que guía sin necesidad de mapas, y tu calidez envuelve como un abrazo. Permanece fiel a ti misma, y cuida tu bienestar como el tesoro que es."
+      ],
+      bien: [
+        "Tu energía radiante llena cada espacio de alegría, y tu creatividad convierte cualquier reto en una oportunidad brillante. Sigue brillando con esa luz que contagia a todos, y cuídate con la misma felicidad que irradias.",
+        "Tu determinación avanza como un río que nunca se detiene, y tu sonrisa ilumina el camino de quien te observa. Que la felicidad te siga como una canción constante, y no olvides consentirte cada día.",
+        "Tu talento brilla como estrellas en la noche, y tu generosidad crea constelaciones de gratitud a tu alrededor. Celebra cada logro con orgullo, y regálate momentos de descanso que refuercen esa chispa infinita.",
+        "Tu alegría es contagiosa, y cada paso que das deja huellas de color en el suelo. Sigue disfrutando de cada instante, y permite que el autocuidado sea parte de tu rutina.",
+        "Tu fuerza interior es un motor que impulsa tus sueños, y tu optimismo pinta de colores brillantes cualquier jornada. Que la vida te siga regalando sorpresas maravillosas, y cuídate con la misma vitalidad.",
+        "Tu presencia ilumina como el sol de la mañana, y tu honestidad crea puentes de confianza. Sigue cultivando esa luz, y regálate tiempo para recargar energías que mantengan tu brillo.",
+        "Tu capacidad de inspirar es como una brisa fresca que revive los ánimos, y tu dedicación muestra la grandeza de tu ser. Celebra tus avances y cuídate con la misma dulzura que ofreces.",
+        "Tu entusiasmo contagia, y tu visión transforma ideas en realidades vibrantes. Que cada día te traiga nuevas razones para celebrar, y dedica momentos a mimarte como mereces.",
+        "Tu coraje enfrenta cualquier desafío con una sonrisa, y tu calidez genera un ambiente donde todos se sienten seguros. Sigue avanzando con esa energía, y tómate tiempo para cuidar tu ser.",
+        "Tu luz interior brilla más que cualquier estrella, y tu bondad deja huellas en cada corazón. Que la felicidad siga acompañándote, y regálate momentos de serenidad que alimenten tu esplendor."
+      ]
+    };
+
+    /* Colibrí más limpio y natural */
+    const BIRD_SVG =
+      '<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M 34 54 Q 14 50, 6 58 Q 18 57, 30 60 Q 20 62, 12 68 Q 24 65, 34 60 Z" fill="url(#birdBody)"/>' +
+        '<path d="M 30 56 Q 30 42, 48 40 Q 70 39, 84 47 Q 78 60, 56 63 Q 38 63, 30 56 Z" fill="url(#birdBody)"/>' +
+        '<path d="M 40 60 Q 52 64, 72 57 Q 60 62, 44 62 Z" fill="url(#birdBelly)" opacity="0.85"/>' +
+        '<path d="M 66 55 Q 78 60, 87 53 Q 79 50, 69 50 Z" fill="url(#birdThroat)" opacity="0.9"/>' +
+        '<circle cx="82" cy="46" r="11" fill="url(#birdBody)"/>' +
+        '<path d="M 74 40 Q 82 35, 90 41" stroke="#c9fff2" stroke-width="1.4" fill="none" opacity="0.5" stroke-linecap="round"/>' +
+        '<path d="M 92 45 L 117 41 L 117 43 L 92 48 Z" fill="#2b303b"/>' +
+        '<circle cx="84.5" cy="44.5" r="2.1" fill="#0a0d14"/>' +
+        '<circle cx="85.2" cy="43.8" r="0.7" fill="#ffffff"/>' +
+        '<g class="wing"><path d="M 52 48 Q 44 20, 62 11 Q 84 19, 79 41 Q 70 53, 52 48 Z" fill="url(#birdWing)" opacity="0.92"/></g>' +
+      '</svg>';
+
+    /* ── Estado ────────────────────────────────────────────────── */
+    let mood = 'triste';
+    let phraseCache = [];
+    let currentBird = null, currentBirdAudio = null;
+    let songLockUntil = 0, playlistIndex = 0;
+    const flock = [];
+    let flockSpawned = false;
+
+    /* ── Frases IA según el ánimo elegido ──────────────────────── */
+    async function loadPhrases(m) {
+      const useMood = m || mood;
+      try {
+        const r = await fetch('/api/frases?n=12&mood=' + useMood, { cache: 'no-store' });
+        if (r.ok) {
+          const d = await r.json();
+          if (Array.isArray(d.frases) && d.frases.length) { phraseCache = d.frases; return; }
+        }
+      } catch (_) { /* offline o sin backend: usamos respaldo */ }
+      phraseCache = FALLBACK[useMood].slice();
+    }
+    function nextPhrase() {
+      const pool = phraseCache.length ? phraseCache : FALLBACK[mood];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    /* ── Crear un pajarito ─────────────────────────────────────── */
+    function makeBird(isMain) {
+      const b = document.createElement('div');
+      b.className = 'colibri' + (isMain ? ' main-bird' : ' pre');
+      const w = isMain ? 118 : (78 + Math.random() * 52);
+      b.style.width  = w + 'px';
+      b.style.height = (w * 0.76) + 'px';
+      b.style.top  = (isMain ? 20 : (12 + Math.random() * 48)) + '%';
+      b.style.left = (isMain ? 5 : (1 + Math.random() * 10)) + '%';
+      b.style.animationDuration = (isMain ? 30 : (22 + Math.random() * 18)) + 's';
+      b.style.animationDelay = (-Math.random() * 24) + 's';
+      if (!isMain && Math.random() < 0.5) b.style.animationDirection = 'reverse';
+      b.innerHTML = (isMain ? '<div class="colibri-hint">hola pajarito</div>' : '') + BIRD_SVG;
+      document.body.appendChild(b);
+      return b;
+    }
+
+    /* ── Pajarito PRINCIPAL (dispara todo) ─────────────────────── */
+    const mainBird = makeBird(true);
+    mainBird.addEventListener('click', openMain);
+
+    /* Salir de una frase: clic en el espacio vacío (el velo) cierra la revelación */
+    document.querySelector('.reveal-veil').addEventListener('click', () => {
+      if (document.body.classList.contains('bird-reveal')) { closeReveal(); hideChooser(); }
+    });
+
+    function openMain() {
+      if (currentBird === mainBird && document.body.classList.contains('bird-reveal')) {
+        closeBird(); hideChooser(); return;      // volver a tocar = cerrar
+      }
+      if (activeMode) { stopMode(activeMode); activeMode = null; stopBirdSong(); }
+      closeReveal();
+      currentBird = mainBird;
+      mainBird.classList.add('bird-active');
+      playBirdSong(randomFrom(MAIN_SONGS));   // canción del principal: aleatoria
+      setRevealText(MAIN_PHRASE);
+      void document.body.offsetWidth;
+      document.body.classList.add('bird-reveal');
+      stardustFromBird(mainBird);
+      showChooser();
+    }
+
+    /* ── Selector de ánimo (dos pollitos) ──────────────────────── */
+    const chooser = document.getElementById('mood-chooser');
+    function showChooser() { chooser.classList.add('show'); }
+    function hideChooser() { chooser.classList.remove('show'); }
+    document.querySelectorAll('.egg-btn').forEach(btn => {
+      btn.addEventListener('click', () => chooseMood(btn.dataset.mood));
+    });
+    function chooseMood(m) {
+      mood = m;
+      loadPhrases(m);            // reconfigura las frases según bien/triste
+      hideChooser();
+      closeReveal();             // desaparece la revelación del principal (la canción sigue)
+      setTimeout(spawnFlock, 450); // ...y salen los demás pajaritos
+    }
+
+    /* ── Bandada (aparece tras elegir ánimo) ───────────────────── */
+    function spawnFlock() {
+      if (!flockSpawned) {
+        for (let i = 0; i < FLOCK_COUNT; i++) {
+          const b = makeBird(false);
+          b.dataset.song = BIRD_SONGS[i % BIRD_SONGS.length];
+          const svg = b.querySelector('svg');
+          if (svg) svg.style.filter = BIRD_TINTS[i % BIRD_TINTS.length];  // color propio
+          b.addEventListener('click', () => openBird(b));
+          flock.push(b);
+        }
+        flockSpawned = true;
+      }
+      flock.forEach((b, i) => setTimeout(() => b.classList.remove('pre'), 300 + i * 220));
+    }
+
+    /* ── Abrir un pajarito de la bandada ───────────────────────── */
+    function openBird(b) {
+      if (currentBird === b) { closeBird(); return; }
+      if (activeMode) { stopMode(activeMode); activeMode = null; stopBirdSong(); }
+      closeReveal();
+      currentBird = b;
+      b.classList.add('bird-active');
+      playBirdSong(b.dataset.song);   // respeta el bloqueo de 1 minuto
+      setRevealText(nextPhrase());
+      void document.body.offsetWidth;
+      document.body.classList.add('bird-reveal');
+      stardustFromBird(b);
+      loadPhrases();             // refresca frases en segundo plano
+    }
+
+    function setRevealText(txt) {
+      const el = document.querySelector('.reveal-text .rt-main');
+      if (el) el.textContent = txt;
+    }
+
+    /* ── Motor de audio con bloqueo de 1 minuto + auto-avance ──── */
+    function randomFrom(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+    function playBirdSong(src) {
+      const now = Date.now();
+      // Si ya suena una canción y aún no pasa el minuto → NO se cambia (solo cambia la frase)
+      if (currentBirdAudio && !currentBirdAudio.paused && now < songLockUntil) return;
+      startSong(src);
+    }
+    function startSong(src) {
+      if (currentBirdAudio) { currentBirdAudio.onended = null; currentBirdAudio.pause(); currentBirdAudio = null; }
+      const idx = PLAYLIST.indexOf(src);
+      if (idx >= 0) playlistIndex = idx;
+      currentBirdAudio = new Audio(src);
+      currentBirdAudio.volume = 0.6;
+      currentBirdAudio.loop = false;   // al terminar, avanza sola a la siguiente
+      currentBirdAudio.onended = () => {
+        playlistIndex = (playlistIndex + 1) % PLAYLIST.length;
+        startSong(PLAYLIST[playlistIndex]);
+      };
+      currentBirdAudio.play().catch(() => {});
+      songLockUntil = Date.now() + SONG_LOCK_MS;
+    }
+    function stopBirdSong() {
+      if (currentBirdAudio) { currentBirdAudio.onended = null; currentBirdAudio.pause(); currentBirdAudio = null; }
+      songLockUntil = 0;
+    }
+
+    loadPhrases();               // precarga inicial (ánimo por defecto)
+
+    function closeReveal() {     // cierra solo la revelación visual (la canción sigue)
+      if (currentBird) { currentBird.classList.remove('bird-active'); currentBird = null; }
+      document.body.classList.remove('bird-reveal');
+    }
+    function closeBird() {       // cierre total: visual + audio
+      closeReveal();
+      stopBirdSong();
+    }
+
+    function stardustFromBird(el) {
+      const r  = el.getBoundingClientRect();
+      const ox = r.left + r.width / 2;
+      const oy = r.top + r.height / 2;
+      const tints = ['#ffffff', '#dfeaff', '#b9d4ff', '#fff2c8'];
+      for (let i = 0; i < 32; i++) {
+        const d  = document.createElement('div');
+        d.className = 'stardust';
+        const sz = 2 + Math.random() * 4;
+        const c  = tints[Math.floor(Math.random() * tints.length)];
+        d.style.left = ox + 'px';
+        d.style.top  = oy + 'px';
+        d.style.width  = sz + 'px';
+        d.style.height = sz + 'px';
+        d.style.background = c;
+        d.style.boxShadow  = '0 0 ' + (sz * 2.6) + 'px ' + c;
+        document.body.appendChild(d);
+        const ang  = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 190;
+        const dx = Math.cos(ang) * dist;
+        const dy = Math.sin(ang) * dist + 40;   /* deriva hacia abajo: melancolía */
+        d.animate([
+          { transform: 'translate(-50%,-50%) scale(1)',   opacity: 0.9 },
+          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.2)`, opacity: 0 }
+        ], { duration: 2600 + Math.random() * 2200, easing: 'ease-out' }).onfinish = () => d.remove();
+      }
     }
   </script>
 </body>
