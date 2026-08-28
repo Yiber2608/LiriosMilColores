@@ -20,12 +20,14 @@ const BASE =
   'tristeza ni echar de menos; prohibido: extrano, duele, lamento, pena, tristeza, herida. ' +
   '(4) No suenes filosofico ni de autoayuda: sencillo, humano, hablando con el corazon. ' +
   '(5) NUNCA menciones estas reglas. Prohibido: te amo, te quiero, amor, mi vida, bebe, ' +
-  'hermosa, y nombres propios. Idioma espanol. Devuelve unicamente JSON valido con una ' +
+  'y nombres propios. Idioma espanol. Devuelve unicamente JSON valido con una ' +
   'clave llamada frases que contenga una lista de textos distintos.';
 
 const PROMPTS = {
   triste: BASE + ' Tono sereno, tierno, suave y calido.',
-  bien:   BASE + ' Tono luminoso, alegre y celebrando que le va genial.'
+  bien:   BASE + ' Tono luminoso, alegre y halagador. Puedes decirle que es increible, ' +
+    'hermosa, maravillosa, brillante y unica; halagos lindos y algo cursis que la hagan ' +
+    'sentir muy valiosa y especial, pero SIN declarar amor romantico.'
 };
 
 // Respaldo por si falta la key o Groq falla: la página nunca se queda sin frases.
@@ -41,14 +43,14 @@ const FALLBACK = {
     "Tu autenticidad es un faro que guía sin necesidad de mapas, y tu calidez envuelve como un abrazo. Permanece fiel a ti misma, y cuida tu bienestar como el tesoro que es."
   ],
   bien: [
-    "Tu energía radiante llena cada espacio de alegría, y tu creatividad convierte cualquier reto en una oportunidad brillante. Sigue brillando con esa luz que contagia a todos, y cuídate con la misma felicidad que irradias.",
-    "Tu determinación avanza como un río que nunca se detiene, y tu sonrisa ilumina el camino de quien te observa. Que la felicidad te siga como una canción constante, y no olvides consentirte cada día.",
-    "Tu talento brilla como estrellas en la noche, y tu generosidad crea constelaciones de gratitud a tu alrededor. Celebra cada logro con orgullo, y regálate momentos de descanso que refuercen esa chispa infinita.",
-    "Tu alegría es contagiosa, y cada paso que das deja huellas de color en el suelo. Sigue disfrutando de cada instante, y permite que el autocuidado sea parte de tu rutina.",
-    "Tu fuerza interior es un motor que impulsa tus sueños, y tu optimismo pinta de colores brillantes cualquier jornada. Que la vida te siga regalando sorpresas maravillosas, y cuídate con la misma vitalidad.",
-    "Tu presencia ilumina como el sol de la mañana, y tu honestidad crea puentes de confianza. Sigue cultivando esa luz, y regálate tiempo para recargar energías que mantengan tu brillo.",
-    "Tu entusiasmo contagia, y tu visión transforma ideas en realidades vibrantes. Que cada día te traiga nuevas razones para celebrar, y dedica momentos a mimarte como mereces.",
-    "Tu luz interior brilla más que cualquier estrella, y tu bondad deja huellas en cada corazón. Que la felicidad siga acompañándote, y regálate momentos de serenidad que alimenten tu esplendor."
+    "Qué persona tan increíble eres: brillas con luz propia y contagias alegría a quien se te acerca. Sos hermosa por dentro y por fuera, y el mundo es un lugar mejor contigo en él.",
+    "Eres maravillosa, de esas personas que iluminan un cuarto solo con entrar. Tu risa vale oro y tu forma de ser es un regalo; nunca dejes de ser tan auténtica y tan tú.",
+    "Sos de las personas que dejan huella: fuerte, brillante y con un corazón enorme. Que nunca se te olvide lo valiosa que eres y todo lo que iluminas a tu paso.",
+    "Increíble, así de simple. Tienes una chispa que pocos tienen y una belleza que no es solo de afuera, sino de todo lo que llevas dentro. Sigue brillando, que te queda perfecto.",
+    "Eres hermosa, capaz y maravillosa, aunque a veces no te lo digan lo suficiente. Hoy que alguien te lo recuerde: vales muchísimo y el mundo tiene suerte de tenerte.",
+    "Sos brillante y hermosa, de esas que hacen ver todo más bonito. Nunca subestimes lo especial que eres ni lo mucho que aportas con solo ser tú misma.",
+    "Eres una persona increíble, con un brillo que no se apaga. Que sigas conquistando todo lo que te propongas, porque te sobra talento, luz y corazón.",
+    "Sos hermosa, valiente y única. El mundo brilla un poco más gracias a personas como tú; no lo olvides nunca, y sigue siendo esa persona tan admirable."
   ]
 };
 

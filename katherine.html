@@ -476,17 +476,73 @@
       from { transform: rotate(-30deg) scaleY(0.82); }
       to   { transform: rotate(36deg)  scaleY(1.06); }
     }
-    /* el pajarito principal NO se voltea, para que "hola pajarito" no salga al revés */
-    @keyframes birdFlyNoFlip {
-      0%   { transform: translate(0, 0)       rotate(-3deg); }
-      15%  { transform: translate(24vw, -7vh) rotate(3deg); }
-      30%  { transform: translate(48vw, 5vh)  rotate(-2deg); }
-      48%  { transform: translate(66vw, -9vh) rotate(4deg); }
-      66%  { transform: translate(44vw, 6vh)  rotate(3deg); }
-      82%  { transform: translate(20vw, -5vh) rotate(-3deg); }
-      100% { transform: translate(0, 0)       rotate(-3deg); }
+    /* el pajarito principal flota en su sitio: nunca vuela de espaldas ni gira el texto */
+    @keyframes birdHover {
+      0%, 100% { transform: translate(0, 0)      rotate(-2deg); }
+      25%      { transform: translate(16px,-18px) rotate(3deg); }
+      50%      { transform: translate(4px,-8px)   rotate(-1deg); }
+      75%      { transform: translate(-12px,-20px) rotate(3deg); }
     }
-    .colibri.main-bird { animation-name: birdFlyNoFlip; }
+    .colibri.main-bird { animation-name: birdHover; }
+
+    /* ===== Pajarito cartero + carta ===== */
+    .letter-bird {
+      position: fixed;
+      z-index: 17;
+      width: 66px; height: 50px;
+      top: 30%; left: 82%;
+      pointer-events: none;
+      -webkit-user-select: none; user-select: none;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45));
+      animation: letterFly 26s ease-in-out infinite;
+      transition: filter 0.4s ease;
+    }
+    .letter-bird svg { width: 100%; height: 100%; overflow: visible; display: block; pointer-events: none; }
+    .letter-bird svg > * { pointer-events: auto; cursor: pointer; }
+    .letter-bird:hover { filter: drop-shadow(0 0 14px rgba(255,180,210,0.9)) drop-shadow(0 6px 10px rgba(0,0,0,0.45)); }
+    .letter-bird .lwing { transform-box: fill-box; transform-origin: center; animation: lflap 0.5s ease-in-out infinite alternate; }
+    .letter-bird .lwing-r { animation-delay: 0.05s; }
+    @keyframes lflap { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+    @keyframes letterFly {
+      0%   { transform: translate(0, 0)          rotate(-2deg); }
+      25%  { transform: translate(-24vw, 9vh)    rotate(2deg); }
+      50%  { transform: translate(-50vw, -6vh)   rotate(-2deg); }
+      75%  { transform: translate(-26vw, 11vh)   rotate(2deg); }
+      100% { transform: translate(0, 0)          rotate(-2deg); }
+    }
+
+    .letter-card {
+      position: fixed;
+      z-index: 20;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.94);
+      width: min(90vw, 560px);
+      max-height: 80vh; overflow: auto;
+      background: linear-gradient(180deg, #fff6fb 0%, #ffe9f2 100%);
+      border: 1px solid #f4c8d8;
+      border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,150,200,0.25);
+      padding: 30px 32px;
+      text-align: center;
+      color: #6a3a4d;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    body.letter-open .letter-card { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .letter-card .lc-title {
+      font-family: 'Great Vibes', cursive; font-weight: 400;
+      font-size: clamp(1.7rem, 5vw, 2.5rem); color: #d05f92; margin-bottom: 12px;
+    }
+    .letter-card .lc-msg {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: clamp(1.05rem, 3vw, 1.4rem); line-height: 1.65;
+    }
+    .letter-card .lc-close {
+      margin-top: 20px; font-size: 0.72rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: #c79bb0;
+    }
+
     /* ===== Revelación oculta y melancólica ===== */
     .reveal-veil {
       position: fixed; inset: 0;
@@ -498,7 +554,8 @@
       pointer-events: none;
       transition: opacity 2.6s ease;
     }
-    body.bird-reveal .reveal-veil { opacity: 1; pointer-events: auto; cursor: pointer; }
+    body.bird-reveal .reveal-veil,
+    body.letter-open .reveal-veil { opacity: 1; pointer-events: auto; cursor: pointer; }
 
     .reveal-star {
       position: fixed;
@@ -1197,6 +1254,24 @@
     </div>
   </div>
 
+  <!-- Pajarito cartero (sobre volador) -->
+  <div class="letter-bird" id="letter-bird" title="una carta para ti">
+    <svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+      <g class="lwing lwing-l"><ellipse cx="26" cy="42" rx="20" ry="11" fill="#ffffff" opacity="0.9"/></g>
+      <g class="lwing lwing-r"><ellipse cx="94" cy="42" rx="20" ry="11" fill="#ffffff" opacity="0.9"/></g>
+      <rect x="36" y="26" width="48" height="36" rx="4" fill="#fdeef2" stroke="#e6a9c0" stroke-width="1.5"/>
+      <path d="M 36 30 L 60 47 L 84 30" fill="none" stroke="#e6a9c0" stroke-width="1.5"/>
+      <path d="M 60 41 C 57 37, 51 38, 51 43 C 51 48, 60 52, 60 52 C 60 52, 69 48, 69 43 C 69 38, 63 37, 60 41 Z" fill="#ff6f9c"/>
+    </svg>
+  </div>
+
+  <!-- Tarjeta de la carta (mensaje por fecha) -->
+  <div class="letter-card">
+    <h3 class="lc-title"></h3>
+    <p class="lc-msg"></p>
+    <div class="lc-close">toca fuera para cerrar</div>
+  </div>
+
   <div class="hint">✦  un jardín bajo las estrellas  ✦</div>
 
   <script src="https://cdn.jsdelivr.net/npm/[email protected]/tsparticles.bundle.min.js"></script>
@@ -1613,21 +1688,34 @@
     const MAIN_SONGS  = [
       'Music/mis-ojos-no-podian-ver.mp3',
       'Music/keane-somewhere-only-we-know.mp3',
-      'Music/orion-cotidianidad.mp3',
-      'Music/los-de-adentro-una-cancion.mp3',
-      'Music/the-cure-boys-dont-cry.mp3'
+      'Music/orion-cotidianidad.mp3'
     ];
-    /* Una canción por pajarito de la bandada (6) */
-    const BIRD_SONGS  = [
-      'Music/keane-somewhere-only-we-know.mp3',
-      'Music/the-lumineers-ophelia.mp3',
-      'Music/eyes-blue-like-the-atlantic.mp3',
-      'Music/olivia-dean-so-easy.mp3',
-      'Music/ali-gatie-its-you.mp3',
-      'Music/los-pericos-pupilas-lejanas.mp3'
-    ];
-    /* Lista para el auto-avance cuando una canción termina sola */
-    const PLAYLIST = Array.from(new Set(MAIN_SONGS.concat(BIRD_SONGS)));
+    /* Playlists por ánimo: si está triste suenan canciones tristes; si está bien, alegres */
+    const SONGS = {
+      triste: [
+        'Music/mis-ojos-no-podian-ver.mp3',
+        'Music/the-cure-boys-dont-cry.mp3',
+        'Music/guns-n-roses-dont-cry.mp3',
+        'Music/keane-somewhere-only-we-know.mp3',
+        'Music/the-lumineers-ophelia.mp3',
+        'Music/eyes-blue-like-the-atlantic.mp3',
+        'Music/orion-lenguas-muertas.mp3',
+        'Music/los-de-adentro-una-cancion.mp3',
+        'Music/until-i-found-you.mp3'
+      ],
+      bien: [
+        'Music/the-turtles-happy-together.mp3',
+        'Music/coldplay-yellow.mp3',
+        'Music/queen-good-old-fashioned-lover-boy.mp3',
+        'Music/magic-rude.mp3',
+        'Music/miley-cyrus-flowers.mp3',
+        'Music/ali-gatie-its-you.mp3',
+        'Music/los-pericos-pupilas-lejanas.mp3',
+        'Music/orion-cotidianidad.mp3',
+        'Music/olivia-dean-so-easy.mp3'
+      ]
+    };
+    let playlist = SONGS.triste;  // se ajusta al elegir el ánimo
     const SONG_LOCK_MS = 60000;   // 1 minuto mínimo antes de que otro click cambie la canción
     const FLOCK_COUNT = 6;
 
@@ -1658,16 +1746,16 @@
         "Tu autenticidad es un faro que guía sin necesidad de mapas, y tu calidez envuelve como un abrazo. Permanece fiel a ti misma, y cuida tu bienestar como el tesoro que es."
       ],
       bien: [
-        "Tu energía radiante llena cada espacio de alegría, y tu creatividad convierte cualquier reto en una oportunidad brillante. Sigue brillando con esa luz que contagia a todos, y cuídate con la misma felicidad que irradias.",
-        "Tu determinación avanza como un río que nunca se detiene, y tu sonrisa ilumina el camino de quien te observa. Que la felicidad te siga como una canción constante, y no olvides consentirte cada día.",
-        "Tu talento brilla como estrellas en la noche, y tu generosidad crea constelaciones de gratitud a tu alrededor. Celebra cada logro con orgullo, y regálate momentos de descanso que refuercen esa chispa infinita.",
-        "Tu alegría es contagiosa, y cada paso que das deja huellas de color en el suelo. Sigue disfrutando de cada instante, y permite que el autocuidado sea parte de tu rutina.",
-        "Tu fuerza interior es un motor que impulsa tus sueños, y tu optimismo pinta de colores brillantes cualquier jornada. Que la vida te siga regalando sorpresas maravillosas, y cuídate con la misma vitalidad.",
-        "Tu presencia ilumina como el sol de la mañana, y tu honestidad crea puentes de confianza. Sigue cultivando esa luz, y regálate tiempo para recargar energías que mantengan tu brillo.",
-        "Tu capacidad de inspirar es como una brisa fresca que revive los ánimos, y tu dedicación muestra la grandeza de tu ser. Celebra tus avances y cuídate con la misma dulzura que ofreces.",
-        "Tu entusiasmo contagia, y tu visión transforma ideas en realidades vibrantes. Que cada día te traiga nuevas razones para celebrar, y dedica momentos a mimarte como mereces.",
-        "Tu coraje enfrenta cualquier desafío con una sonrisa, y tu calidez genera un ambiente donde todos se sienten seguros. Sigue avanzando con esa energía, y tómate tiempo para cuidar tu ser.",
-        "Tu luz interior brilla más que cualquier estrella, y tu bondad deja huellas en cada corazón. Que la felicidad siga acompañándote, y regálate momentos de serenidad que alimenten tu esplendor."
+        "Qué persona tan increíble eres: brillas con luz propia y contagias alegría a quien se te acerca. Sos hermosa por dentro y por fuera, y el mundo es un lugar mejor contigo en él.",
+        "Eres maravillosa, de esas personas que iluminan un cuarto solo con entrar. Tu risa vale oro y tu forma de ser es un regalo; nunca dejes de ser tan auténtica y tan tú.",
+        "Sos de las personas que dejan huella: fuerte, brillante y con un corazón enorme. Que nunca se te olvide lo valiosa que eres y todo lo que iluminas a tu paso.",
+        "Increíble, así de simple. Tienes una chispa que pocos tienen y una belleza que no es solo de afuera, sino de todo lo que llevas dentro. Sigue brillando, que te queda perfecto.",
+        "Eres hermosa, capaz y maravillosa, aunque a veces no te lo digan lo suficiente. Hoy que alguien te lo recuerde: vales muchísimo y el mundo tiene suerte de tenerte.",
+        "Qué maravilla de persona eres: talentosa, luminosa y con una fuerza que inspira. Que la vida te devuelva toda la alegría que repartes sin siquiera darte cuenta.",
+        "Sos brillante y hermosa, de esas que hacen ver todo más bonito. Nunca subestimes lo especial que eres ni lo mucho que aportas con solo ser tú misma.",
+        "Eres una persona increíble, con un brillo que no se apaga. Que sigas conquistando todo lo que te propongas, porque te sobra talento, luz y corazón.",
+        "Maravillosa por donde se te mire: fuerte, dulce y radiante. Ojalá te veas como te ven los demás, porque eres de lo mejorcito que hay.",
+        "Sos hermosa, valiente y única. El mundo brilla un poco más gracias a personas como tú; no lo olvides nunca, y sigue siendo esa persona tan admirable."
       ]
     };
 
@@ -1718,9 +1806,9 @@
       const w = isMain ? 118 : (78 + Math.random() * 52);
       b.style.width  = w + 'px';
       b.style.height = (w * 0.76) + 'px';
-      b.style.top  = (isMain ? 20 : (12 + Math.random() * 48)) + '%';
-      b.style.left = (isMain ? 5 : (1 + Math.random() * 10)) + '%';
-      b.style.animationDuration = (isMain ? 30 : (22 + Math.random() * 18)) + 's';
+      b.style.top  = (isMain ? 16 : (12 + Math.random() * 48)) + '%';
+      b.style.left = (isMain ? 10 : (1 + Math.random() * 10)) + '%';
+      b.style.animationDuration = (isMain ? 8 : (22 + Math.random() * 18)) + 's';
       b.style.animationDelay = (-Math.random() * 24) + 's';
       if (!isMain && Math.random() < 0.5) b.style.animationDirection = 'reverse';
       b.innerHTML = (isMain ? '<div class="colibri-hint">hola pajarito</div>' : '') + BIRD_SVG;
@@ -1735,7 +1823,39 @@
     /* Salir de una frase: clic en el espacio vacío (el velo) cierra la revelación */
     document.querySelector('.reveal-veil').addEventListener('click', () => {
       if (document.body.classList.contains('bird-reveal')) { closeReveal(); hideChooser(); }
+      if (document.body.classList.contains('letter-open')) closeLetter();
     });
+
+    /* ── Cartica por fecha (mensajes configurables en cartas.json) ── */
+    let cartas = { mensajeNoDisponible: 'Hoy no puedes ver este mensaje 💌  vuelve otro día…', cartas: [] };
+    fetch('cartas.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) cartas = d; })
+      .catch(() => {});
+    function todayStr() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return d.getFullYear() + '-' + mm + '-' + dd;
+    }
+    document.getElementById('letter-bird').addEventListener('click', openLetter);
+    function openLetter() {
+      if (activeMode) { stopMode(activeMode); activeMode = null; }
+      stopBirdSong();
+      closeReveal(); hideChooser();
+      const hoy = todayStr();
+      const c = (cartas.cartas || []).find(x => x.fecha === hoy);
+      const card = document.querySelector('.letter-card');
+      if (c) {
+        card.querySelector('.lc-title').textContent = c.titulo || 'Para ti';
+        card.querySelector('.lc-msg').textContent = c.mensaje || '';
+      } else {
+        card.querySelector('.lc-title').textContent = '···';
+        card.querySelector('.lc-msg').textContent = cartas.mensajeNoDisponible || 'Hoy no puedes ver este mensaje.';
+      }
+      document.body.classList.add('letter-open');
+    }
+    function closeLetter() { document.body.classList.remove('letter-open'); }
 
     function openMain() {
       if (currentBird === mainBird && document.body.classList.contains('bird-reveal')) {
@@ -1762,6 +1882,7 @@
     });
     function chooseMood(m) {
       mood = m;
+      playlist = SONGS[m];       // triste = canciones tristes; bien = alegres
       loadPhrases(m);            // reconfigura las frases según bien/triste
       hideChooser();
       closeReveal();             // desaparece la revelación del principal (la canción sigue)
@@ -1773,7 +1894,7 @@
       if (!flockSpawned) {
         for (let i = 0; i < FLOCK_COUNT; i++) {
           const b = makeBird(false);
-          b.dataset.song = BIRD_SONGS[i % BIRD_SONGS.length];
+          b.dataset.song = playlist[i % playlist.length];
           const svg = b.querySelector('svg');
           if (svg) svg.style.filter = BIRD_TINTS[i % BIRD_TINTS.length];  // color propio
           b.addEventListener('click', () => openBird(b));
@@ -1815,14 +1936,14 @@
     }
     function startSong(src) {
       if (currentBirdAudio) { currentBirdAudio.onended = null; currentBirdAudio.pause(); currentBirdAudio = null; }
-      const idx = PLAYLIST.indexOf(src);
+      const idx = playlist.indexOf(src);
       if (idx >= 0) playlistIndex = idx;
       currentBirdAudio = new Audio(src);
       currentBirdAudio.volume = 0.6;
       currentBirdAudio.loop = false;   // al terminar, avanza sola a la siguiente
       currentBirdAudio.onended = () => {
-        playlistIndex = (playlistIndex + 1) % PLAYLIST.length;
-        startSong(PLAYLIST[playlistIndex]);
+        playlistIndex = (playlistIndex + 1) % playlist.length;
+        startSong(playlist[playlistIndex]);
       };
       currentBirdAudio.play().catch(() => {});
       songLockUntil = Date.now() + SONG_LOCK_MS;
