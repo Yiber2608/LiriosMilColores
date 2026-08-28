@@ -543,6 +543,90 @@
       text-transform: uppercase; color: #c79bb0;
     }
 
+    /* ===== Mariposas de colores (ánimo triste) ===== */
+    .butterfly {
+      position: fixed;
+      z-index: 16;
+      width: 72px; height: 56px;
+      pointer-events: none;
+      -webkit-user-select: none; user-select: none;
+      filter: drop-shadow(0 6px 9px rgba(0,0,0,0.4));
+      animation: flutterFly 20s ease-in-out infinite;
+      transition: filter 0.4s ease, opacity 1.2s ease;
+    }
+    .butterfly svg { width: 100%; height: 100%; overflow: visible; display: block; pointer-events: none; }
+    .butterfly svg > * { pointer-events: auto; cursor: pointer; }
+    .butterfly:hover { filter: drop-shadow(0 0 15px rgba(255,170,235,0.9)) drop-shadow(0 6px 9px rgba(0,0,0,0.4)); }
+    .butterfly .bwing { transform-box: fill-box; animation: bflap 0.34s ease-in-out infinite alternate; }
+    .butterfly .bwing-l { transform-origin: right center; }
+    .butterfly .bwing-r { transform-origin: left center; }
+    @keyframes bflap { from { transform: scaleX(1); } to { transform: scaleX(0.5); } }
+    @keyframes flutterFly {
+      0%   { transform: translate(0, 0)         rotate(-6deg); }
+      20%  { transform: translate(18vw, -12vh)  rotate(8deg); }
+      40%  { transform: translate(40vw, 4vh)    rotate(-8deg); }
+      60%  { transform: translate(60vw, -14vh)  rotate(6deg); }
+      80%  { transform: translate(30vw, 6vh)    rotate(-6deg); }
+      100% { transform: translate(0, 0)         rotate(-6deg); }
+    }
+    .butterfly.pre { opacity: 0 !important; }
+    .butterfly.pre svg > * { pointer-events: none; cursor: default; }
+    body.bird-reveal .butterfly {
+      animation-play-state: paused;
+      opacity: 0.22;
+      transition: opacity 1s ease;
+    }
+    body.bird-reveal .butterfly.bird-active {
+      opacity: 1;
+      z-index: 19;
+      filter: drop-shadow(0 0 20px rgba(255,170,235,0.9)) drop-shadow(0 6px 9px rgba(0,0,0,0.4));
+    }
+
+    /* ===== Chiste malo (2 opciones) ===== */
+    .joke {
+      position: fixed;
+      z-index: 21;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(92vw, 640px);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    body.joke-open .joke { opacity: 1; pointer-events: auto; }
+    .joke-q {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: clamp(1.2rem, 3.6vw, 2rem);
+      color: #fff2c8; text-shadow: 0 0 18px rgba(255,200,120,0.4);
+      margin-bottom: 24px; line-height: 1.4;
+    }
+    .joke-opts { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .joke-opt {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.7vw, 1.35rem);
+      color: #fff; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.35); border-radius: 12px;
+      padding: 13px 18px; cursor: pointer; max-width: 46%;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+    .joke-opt:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+    .joke-opt.ok { background: rgba(120,230,140,0.25); border-color: #7ee68c; }
+    .joke-opt.no { background: rgba(255,120,120,0.2); border-color: #ff8f8f; }
+    .joke-result {
+      margin-top: 22px; min-height: 1.4em;
+      font-family: 'Great Vibes', cursive; font-size: clamp(1.5rem, 4.4vw, 2.4rem);
+      color: #ffe6a8; text-shadow: 0 0 16px rgba(255,200,120,0.4);
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    .joke-result.show { opacity: 1; }
+    .joke-result small {
+      display: block; margin-top: 6px;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 0.42em; letter-spacing: 0.18em; color: rgba(255,255,255,0.55);
+    }
+
     /* ===== Revelación oculta y melancólica ===== */
     .reveal-veil {
       position: fixed; inset: 0;
@@ -608,7 +692,7 @@
       margin: 0;
       transition: opacity 1.6s ease;
     }
-    body.bird-reveal .reveal-text .rt-main { animation: lineIn 3s ease-out 1.1s forwards; }
+    .reveal-text .rt-main.show { animation: lineIn 2.6s ease-out forwards; }
     @keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
 
     body.bird-reveal .colibri {
@@ -1198,6 +1282,11 @@
         <stop offset="0%"   stop-color="#ff6d8f"/>
         <stop offset="100%" stop-color="#c81d5a"/>
       </linearGradient>
+      <linearGradient id="flutterWing" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#ffd0ec"/>
+        <stop offset="45%"  stop-color="#ff7ec0"/>
+        <stop offset="100%" stop-color="#a06bff"/>
+      </linearGradient>
     </defs>
   </svg>
 
@@ -1206,6 +1295,16 @@
   <div class="reveal-star"></div>
   <div class="reveal-text">
     <p class="rt-main"></p>
+  </div>
+
+  <!-- Chiste malo con 2 opciones (antes de la frase) -->
+  <div class="joke">
+    <p class="joke-q"></p>
+    <div class="joke-opts">
+      <button class="joke-opt" data-i="0"></button>
+      <button class="joke-opt" data-i="1"></button>
+    </div>
+    <p class="joke-result"></p>
   </div>
 
   <!-- Selector de ánimo: dos huevos con pollitos -->
@@ -1774,13 +1873,62 @@
         '<g class="wing"><path d="M 52 48 Q 44 20, 62 11 Q 84 19, 79 41 Q 70 53, 52 48 Z" fill="url(#birdWing)" opacity="0.92"/></g>' +
       '</svg>';
 
+    /* Mariposa de colores (ánimo triste) */
+    const BUTTERFLY_SVG =
+      '<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">' +
+        '<g class="bwing bwing-l">' +
+          '<path d="M 60 42 C 40 16, 8 12, 8 36 C 8 54, 40 52, 60 46 Z" fill="url(#flutterWing)" stroke="#c86bd0" stroke-width="1" stroke-opacity="0.4"/>' +
+          '<path d="M 60 48 C 46 58, 20 74, 22 54 C 24 46, 46 48, 60 51 Z" fill="url(#flutterWing)" stroke="#c86bd0" stroke-width="1" stroke-opacity="0.4"/>' +
+          '<circle cx="26" cy="32" r="4" fill="#ffffff" opacity="0.55"/>' +
+        '</g>' +
+        '<g class="bwing bwing-r">' +
+          '<path d="M 60 42 C 80 16, 112 12, 112 36 C 112 54, 80 52, 60 46 Z" fill="url(#flutterWing)" stroke="#c86bd0" stroke-width="1" stroke-opacity="0.4"/>' +
+          '<path d="M 60 48 C 74 58, 100 74, 98 54 C 96 46, 74 48, 60 51 Z" fill="url(#flutterWing)" stroke="#c86bd0" stroke-width="1" stroke-opacity="0.4"/>' +
+          '<circle cx="94" cy="32" r="4" fill="#ffffff" opacity="0.55"/>' +
+        '</g>' +
+        '<ellipse cx="60" cy="46" rx="3.4" ry="19" fill="#3a2b40"/>' +
+        '<circle cx="60" cy="28" r="3.4" fill="#3a2b40"/>' +
+        '<path d="M 58 26 Q 52 14, 47 11" stroke="#3a2b40" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
+        '<path d="M 62 26 Q 68 14, 73 11" stroke="#3a2b40" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
+        '<circle cx="47" cy="11" r="2" fill="#3a2b40"/>' +
+        '<circle cx="73" cy="11" r="2" fill="#3a2b40"/>' +
+      '</svg>';
+
+    /* Chistes malos de respaldo (si /api/chiste no responde) */
+    const CHISTES = [
+      { q: "¿Cuál es el colmo de un electricista?", correcta: "Que siempre le dé miedo la corriente.", falsa: "Que le cobren por la luz." },
+      { q: "¿Por qué el libro de matemáticas está triste?", correcta: "Porque tiene muchos problemas.", falsa: "Porque nunca tiene respuestas." },
+      { q: "¿Qué le dice una iguana a su hermana?", correcta: "¡Iguanita, qué tal!", falsa: "¡Iguanita, dame calor!" },
+      { q: "¿Cuál es el animal más antiguo?", correcta: "La cebra, porque está en blanco y negro.", falsa: "El pingüino, porque siempre lleva traje." },
+      { q: "¿Por qué la pelota no puede guardar secretos?", correcta: "Porque siempre rebota la información.", falsa: "Porque siempre se le escapa la presión." },
+      { q: "¿Qué le dijo el tomate a la cebolla?", correcta: "¡No llores, que yo también soy rojo!", falsa: "¡No llores, que yo también tengo capas!" },
+      { q: "¿Cómo se llama el campeón de buceo japonés?", correcta: "Tokofondo.", falsa: "Miyamare." },
+      { q: "¿Qué hace una abeja en el gimnasio?", correcta: "Zum-ba.", falsa: "Miel-itar." },
+      { q: "¿Cuál es la fruta más divertida?", correcta: "La sandía, porque siempre está de fiesta.", falsa: "El melón, porque tiene muchas semillas." },
+      { q: "¿Por qué los fantasmas no mienten?", correcta: "Porque se les ve a través.", falsa: "Porque siempre están transparentes." },
+      { q: "¿Qué le dice un semáforo a otro?", correcta: "No te pongas rojo, que yo estoy verde.", falsa: "Cambia de luz, que estoy cansado." },
+      { q: "¿Cómo se llama el perro de un mago?", correcta: "Ladrín.", falsa: "Abracane." }
+    ];
+    let chisteCache = [];
+    async function loadChistes() {
+      try {
+        const r = await fetch('/api/chiste?n=8', { cache: 'no-store' });
+        if (r.ok) {
+          const d = await r.json();
+          if (Array.isArray(d.chistes) && d.chistes.length) { chisteCache = d.chistes; return; }
+        }
+      } catch (_) { /* offline o sin backend: usamos respaldo */ }
+      chisteCache = CHISTES.slice();
+    }
+
     /* ── Estado ────────────────────────────────────────────────── */
     let mood = 'triste';
     let phraseCache = [];
     let currentBird = null, currentBirdAudio = null;
     let songLockUntil = 0, playlistIndex = 0;
     const flock = [];
-    let flockSpawned = false;
+    let flockSpawned = false, flockKind = null;
+    let currentJoke = null;
 
     /* ── Frases IA según el ánimo elegido ──────────────────────── */
     async function loadPhrases(m) {
@@ -1889,40 +2037,107 @@
       setTimeout(spawnFlock, 450); // ...y salen los demás pajaritos
     }
 
-    /* ── Bandada (aparece tras elegir ánimo) ───────────────────── */
+    /* ── Crear una criatura de la bandada (pájaro o mariposa) ──── */
+    function makeCreature(kind) {
+      const el = document.createElement('div');
+      const isB = (kind === 'butterfly');
+      el.className = (isB ? 'butterfly' : 'colibri') + ' pre';
+      const w = isB ? (60 + Math.random() * 40) : (78 + Math.random() * 52);
+      el.style.width  = w + 'px';
+      el.style.height = (w * (isB ? 0.78 : 0.76)) + 'px';
+      el.style.top  = (12 + Math.random() * 48) + '%';
+      el.style.left = (1 + Math.random() * 10) + '%';
+      el.style.animationDuration = ((isB ? 16 : 22) + Math.random() * 18) + 's';
+      el.style.animationDelay = (-Math.random() * 24) + 's';
+      if (Math.random() < 0.5) el.style.animationDirection = 'reverse';
+      el.innerHTML = isB ? BUTTERFLY_SVG : BIRD_SVG;
+      document.body.appendChild(el);
+      return el;
+    }
+
+    /* ── Bandada: pájaros si "bien", mariposas si "triste" ─────── */
     function spawnFlock() {
+      const kind = (mood === 'bien') ? 'bird' : 'butterfly';
+      if (flockSpawned && flockKind !== kind) {   // cambió el ánimo → cambia la especie
+        flock.forEach(el => el.remove());
+        flock.length = 0;
+        flockSpawned = false;
+      }
       if (!flockSpawned) {
+        flockKind = kind;
         for (let i = 0; i < FLOCK_COUNT; i++) {
-          const b = makeBird(false);
-          b.dataset.song = playlist[i % playlist.length];
-          const svg = b.querySelector('svg');
+          const el = makeCreature(kind);
+          el.dataset.song = playlist[i % playlist.length];
+          const svg = el.querySelector('svg');
           if (svg) svg.style.filter = BIRD_TINTS[i % BIRD_TINTS.length];  // color propio
-          b.addEventListener('click', () => openBird(b));
-          flock.push(b);
+          el.addEventListener('click', () => openCreature(el));
+          flock.push(el);
         }
         flockSpawned = true;
       }
-      flock.forEach((b, i) => setTimeout(() => b.classList.remove('pre'), 300 + i * 220));
+      flock.forEach((el, i) => setTimeout(() => el.classList.remove('pre'), 300 + i * 220));
     }
 
-    /* ── Abrir un pajarito de la bandada ───────────────────────── */
-    function openBird(b) {
-      if (currentBird === b) { closeBird(); return; }
+    /* ── Abrir una criatura: primero el CHISTE, luego la frase ──── */
+    function openCreature(el) {
+      if (currentBird === el) { closeBird(); return; }
       if (activeMode) { stopMode(activeMode); activeMode = null; stopBirdSong(); }
       closeReveal();
-      currentBird = b;
-      b.classList.add('bird-active');
-      playBirdSong(b.dataset.song);   // respeta el bloqueo de 1 minuto
-      setRevealText(nextPhrase());
+      currentBird = el;
+      el.classList.add('bird-active');
+      playBirdSong(el.dataset.song);   // respeta el bloqueo de 1 minuto
+      setRevealText('');               // la frase llega después del chiste
       void document.body.offsetWidth;
       document.body.classList.add('bird-reveal');
-      stardustFromBird(b);
+      stardustFromBird(el);
+      showJoke();
       loadPhrases();             // refresca frases en segundo plano
+    }
+
+    /* ── Chiste con 2 opciones ─────────────────────────────────── */
+    function showJoke() {
+      const j = randomFrom(chisteCache.length ? chisteCache : CHISTES);
+      currentJoke = j;
+      const correctFirst = Math.random() < 0.5;
+      const values = correctFirst ? [j.correcta, j.falsa] : [j.falsa, j.correcta];
+      const correctIndex = correctFirst ? 0 : 1;
+      document.querySelector('.joke-q').textContent = j.q;
+      document.querySelectorAll('.joke-opt').forEach((b, i) => {
+        b.textContent = values[i];
+        b.className = 'joke-opt';
+        b.dataset.correct = (i === correctIndex) ? '1' : '0';
+        b.disabled = false;
+      });
+      const res = document.querySelector('.joke-result');
+      res.className = 'joke-result'; res.innerHTML = '';
+      document.body.classList.add('joke-open');
+      loadChistes();             // refresca chistes en segundo plano
+    }
+    document.querySelectorAll('.joke-opt').forEach(b => {
+      b.addEventListener('click', () => answerJoke(b));
+    });
+    function answerJoke(btn) {
+      const opts = document.querySelectorAll('.joke-opt');
+      opts.forEach(b => b.disabled = true);
+      const correct = btn.dataset.correct === '1';
+      opts.forEach(b => { if (b.dataset.correct === '1') b.classList.add('ok'); });
+      if (!correct) btn.classList.add('no');
+      const res = document.querySelector('.joke-result');
+      res.innerHTML = (correct ? 'uff, eres buena 😌' : 'nahh, perdiste 🙈') + '<small>— mis chistes malos</small>';
+      res.classList.add('show');
+      setTimeout(() => {
+        if (!document.body.classList.contains('bird-reveal')) return; // ya se cerró
+        document.body.classList.remove('joke-open');
+        setRevealText(nextPhrase());   // ahora sí, la frase según el ánimo
+      }, 2300);
     }
 
     function setRevealText(txt) {
       const el = document.querySelector('.reveal-text .rt-main');
-      if (el) el.textContent = txt;
+      if (!el) return;
+      el.classList.remove('show');
+      el.textContent = txt;
+      if (txt) { void el.offsetWidth; el.classList.add('show'); }
     }
 
     /* ── Motor de audio con bloqueo de 1 minuto + auto-avance ──── */
@@ -1954,10 +2169,14 @@
     }
 
     loadPhrases();               // precarga inicial (ánimo por defecto)
+    loadChistes();               // precarga chistes
 
     function closeReveal() {     // cierra solo la revelación visual (la canción sigue)
       if (currentBird) { currentBird.classList.remove('bird-active'); currentBird = null; }
       document.body.classList.remove('bird-reveal');
+      document.body.classList.remove('joke-open');
+      const rt = document.querySelector('.reveal-text .rt-main');
+      if (rt) rt.classList.remove('show');
     }
     function closeBird() {       // cierre total: visual + audio
       closeReveal();
