@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     return res.status(403).json({ ok: false, error: 'pin' });
   }
 
-  const hook = process.env.MENSAJES_WEBHOOK_URL;
+  const hook = process.env.SHEET_WEBHOOK_URL || process.env.MENSAJES_WEBHOOK_URL;
   if (!hook) return res.status(501).json({ ok: false, error: 'sin-almacen' });
 
   const registro = {

@@ -2046,31 +2046,39 @@
     }
     function closeLetter() { document.body.classList.remove('letter-open'); }
 
-    function unlockLetter() {
+    async function unlockLetter() {
       const pinInput = letterCard.querySelector('.lc-pin');
       const err = letterCard.querySelector('.lc-error');
-      if ((pinInput.value || '').trim() !== (cartas.pin || '')) {
-        err.textContent = 'Pin incorrecto… inténtalo otra vez.';
-        pinInput.value = '';
-        return;
-      }
-      const c = (cartas.cartas || []).find(x => x.fecha === todayStr());
+      const pin = (pinInput.value || '').trim();
+      err.textContent = 'Abriendo…';
+      let data = null;
+      try {   // producción: las cartas vienen privadas desde el servidor
+        const r = await fetch('/api/carta?pin=' + encodeURIComponent(pin), { cache: 'no-store' });
+        if (r.status === 200) { const d = await r.json(); if (d && d.ok) data = d; }
+      } catch (_) { /* sin backend: probamos el respaldo local */ }
+      if (!data && cartas && cartas.pin && pin === cartas.pin) data = cartas;   // local (cartas.json)
+      if (!data) { err.textContent = 'Pin incorrecto… inténtalo otra vez.'; pinInput.value = ''; return; }
+      err.textContent = '';
+      renderCarta(data);
+      letterCard.querySelector('.lc-lock').hidden = true;
+      letterCard.querySelector('.lc-content').hidden = false;
+      letterCard.scrollTop = 0;
+    }
+    function renderCarta(data) {
+      const c = (data.cartas || []).find(x => x.fecha === todayStr());
       const titleEl = letterCard.querySelector('.lc-title');
       const msgEl = letterCard.querySelector('.lc-msg');
       msgEl.innerHTML = '';
       if (c) {
         titleEl.textContent = c.titulo || 'Para ti';
-        const parras = (c.parrafos && c.parrafos.length) ? c.parrafos : [c.mensaje || ''];
+        const parras = (c.parrafos && c.parrafos.length) ? c.parrafos : [(c.mensaje || '')];
         parras.forEach(p => { const el = document.createElement('p'); el.textContent = p; msgEl.appendChild(el); });
       } else {
         titleEl.textContent = '···';
         const el = document.createElement('p');
-        el.textContent = cartas.mensajeNoDisponible || 'Hoy no puedes ver este mensaje.';
+        el.textContent = data.mensajeNoDisponible || (cartas && cartas.mensajeNoDisponible) || 'Hoy no puedes ver este mensaje.';
         msgEl.appendChild(el);
       }
-      letterCard.querySelector('.lc-lock').hidden = true;
-      letterCard.querySelector('.lc-content').hidden = false;
-      letterCard.scrollTop = 0;
     }
     letterCard.querySelector('.lc-unlock').addEventListener('click', unlockLetter);
     letterCard.querySelector('.lc-pin').addEventListener('keydown', e => { if (e.key === 'Enter') unlockLetter(); });
