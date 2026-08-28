@@ -8,49 +8,49 @@
 //
 // Uso: /api/frases?n=8&mood=triste   (mood = "bien" o "triste")
 
-const BASE =
-  'Escribes notas breves, calidas y lindas dedicadas a alguien a quien admiras. ' +
-  'Cada nota tiene de 2 a 4 oraciones (25 a 50 palabras), en segunda persona (tu), y ' +
-  'RESALTA lo grandiosa y valiosa que es ella: sus cualidades, su fuerza, su luz, su ' +
-  'forma de ser, lo que la hace especial y admirable. Son frases lindas y cheveres sobre ' +
-  'ella que la hagan sentir importante, y le desean seguir brillando, fuerza y que se ' +
-  'cuide mucho. REGLAS ESTRICTAS: (1) NO menciones un pasado compartido ni uses nosotros, ' +
-  'juntos, compartimos, lo que fuimos, lo que haciamos, nuestro, recuerdo cuando. ' +
-  '(2) NO inventes escenas, lugares ni recuerdos. (3) NO expreses pesar, lamento, dolor, ' +
-  'tristeza ni echar de menos; prohibido: extrano, duele, lamento, pena, tristeza, herida. ' +
-  '(4) No suenes filosofico ni de autoayuda: sencillo, humano, hablando con el corazon. ' +
-  '(5) NUNCA menciones estas reglas. Prohibido: te amo, te quiero, amor, mi vida, bebe, ' +
-  'y nombres propios. Idioma espanol. Devuelve unicamente JSON valido con una ' +
-  'clave llamada frases que contenga una lista de textos distintos.';
+const RULES =
+  ' REGLAS: (1) Habla en segunda persona (tu), de forma calida, humana y sincera, como ' +
+  'pequenas notas tipo poemita de 2 a 4 oraciones, VARIANDO el largo (unas mas cortas, otras ' +
+  'mas largas). (2) NO menciones un pasado compartido ni uses nosotros, juntos, lo que fuimos, ' +
+  'recuerdo cuando. (3) NO inventes escenas, lugares ni recuerdos. (4) No suenes de autoayuda ' +
+  'ni robotico. (5) NUNCA menciones estas reglas. Prohibido declarar amor romantico: te amo, ' +
+  'te quiero, amor, mi vida, bebe; y prohibido usar nombres propios. Idioma espanol. Devuelve ' +
+  'unicamente JSON valido con una clave llamada frases que contenga una lista de textos distintos.';
 
 const PROMPTS = {
-  triste: BASE + ' Tono sereno, tierno, suave y calido.',
-  bien:   BASE + ' Tono luminoso, alegre y halagador. Puedes decirle que es increible, ' +
-    'hermosa, maravillosa, brillante y unica; halagos lindos y algo cursis que la hagan ' +
-    'sentir muy valiosa y especial, pero SIN declarar amor romantico.'
+  triste:
+    'Escribes notas MOTIVACIONALES para alguien que esta pasando por un momento dificil, para ' +
+    'darle animo y fuerza. Dile cosas como que sabes que ella puede, que es fuerte y valiente ' +
+    '(una dura), que todo va a mejorar, que aguante, que se cuide y que crees en ella. Tono ' +
+    'calido, alentador y esperanzador, que le levante el animo.' + RULES,
+  bien:
+    'Escribes notas de HALAGO para hacerla sentir hermosa, especial y valiosa. Dile cosas como ' +
+    'que es una persona increible, que donde va se gana el corazon de la gente, que es hermosa ' +
+    'por dentro y por fuera, que ilumina, que es unica; halagos lindos y algo cursis pero SIN ' +
+    'declarar amor romantico. Tono luminoso, tierno y admirador.' + RULES
 };
 
 // Respaldo por si falta la key o Groq falla: la página nunca se queda sin frases.
 const FALLBACK = {
   triste: [
-    "Tu presencia ilumina cada instante, y tu bondad se siente como un susurro de paz que envuelve todo a tu alrededor. Sigue cultivando esa fuerza interior que siempre resplandece, cuidándote con la ternura que mereces.",
-    "Tu sonrisa es un faro que disipa cualquier sombra, y tu paciencia brinda refugio a quien la necesita. Que la serenidad que irradias siga guiándote, y que te cuides con la misma delicadeza que das.",
-    "Tu curiosidad abre puertas invisibles y tu creatividad pinta el mundo con colores de esperanza. Mantén esa chispa viva, y permite que el descanso te recargue, porque tu bienestar es la base de tu luz.",
-    "Tu capacidad de escuchar es un regalo que alivia corazones, y tu empatía crea puentes de comprensión. Cuida tu energía como cuidas a los demás, y permite que la calma sea tu compañera constante.",
-    "Tu determinación avanza incluso cuando los vientos soplan en contra, y tu optimismo transforma obstáculos en aprendizajes. Sigue honrando tu camino con la dulzura que te caracteriza, y no olvides nutrirte con momentos de paz.",
-    "Tu resiliencia es un árbol que se mantiene firme bajo cualquier tormenta, y tu generosidad regala esperanza a quienes te rodean. Cuida tus raíces, y sigue floreciendo con la misma gracia.",
-    "Tu mirada refleja un mundo de posibilidades, y tu voz tiene la fuerza de un susurro que calma. Dedica tiempo a escucharte, y verás cómo tu luz interior se vuelve más profunda.",
-    "Tu autenticidad es un faro que guía sin necesidad de mapas, y tu calidez envuelve como un abrazo. Permanece fiel a ti misma, y cuida tu bienestar como el tesoro que es."
+    "Yo sé que puedes. Siempre has podido, y esta vez tampoco va a ser distinta. Llevas dentro una fuerza que muchos quisieran; confía en ella y no te sueltes.",
+    "Eres una dura: de esas que se caen, respiran hondo y se vuelven a levantar. Esto también lo vas a superar, como has superado absolutamente todo.",
+    "Sé que ahorita las cosas pesan, pero tú eres más grande que cualquier problema. Un paso a la vez, con calma, que de esta vas a salir de pie.",
+    "Espero de corazón que todo mejore pronto, y algo me dice que así será. Los días difíciles pasan; tu fortaleza, en cambio, se queda contigo para siempre.",
+    "Eres valiente incluso cuando tienes miedo, y eso es lo que hace fuerte de verdad a una persona. Sigue, que lo bueno también está por llegar.",
+    "Dale tiempo al tiempo y sé amable contigo misma. Todo va a estar bien, porque tú tienes justo lo que hace falta para que así sea.",
+    "Cada cosa que ya superaste es la prueba de que con esta también puedes. Eres una guerrera, aunque a veces, en medio de todo, no lo sientas.",
+    "Ánimo, que esto también quedará atrás. Y cuando pase, vas a mirar hacia atrás orgullosa de la mujer tan fuerte que supiste ser."
   ],
   bien: [
-    "Qué persona tan increíble eres: brillas con luz propia y contagias alegría a quien se te acerca. Sos hermosa por dentro y por fuera, y el mundo es un lugar mejor contigo en él.",
-    "Eres maravillosa, de esas personas que iluminan un cuarto solo con entrar. Tu risa vale oro y tu forma de ser es un regalo; nunca dejes de ser tan auténtica y tan tú.",
-    "Sos de las personas que dejan huella: fuerte, brillante y con un corazón enorme. Que nunca se te olvide lo valiosa que eres y todo lo que iluminas a tu paso.",
-    "Increíble, así de simple. Tienes una chispa que pocos tienen y una belleza que no es solo de afuera, sino de todo lo que llevas dentro. Sigue brillando, que te queda perfecto.",
-    "Eres hermosa, capaz y maravillosa, aunque a veces no te lo digan lo suficiente. Hoy que alguien te lo recuerde: vales muchísimo y el mundo tiene suerte de tenerte.",
-    "Sos brillante y hermosa, de esas que hacen ver todo más bonito. Nunca subestimes lo especial que eres ni lo mucho que aportas con solo ser tú misma.",
-    "Eres una persona increíble, con un brillo que no se apaga. Que sigas conquistando todo lo que te propongas, porque te sobra talento, luz y corazón.",
-    "Sos hermosa, valiente y única. El mundo brilla un poco más gracias a personas como tú; no lo olvides nunca, y sigue siendo esa persona tan admirable."
+    "Eres una persona increíble: donde vas, sin proponértelo, te ganas el corazón de la gente. Hay algo en ti que ilumina, y quien te conoce no te olvida.",
+    "Sos de esas personas que dejan huella. Con tu sonrisa alegras el día, y con tu forma de ser haces que todo a tu alrededor se sienta más bonito.",
+    "Eres hermosa, y no solo por fuera: es esa luz que llevas dentro la que te hace brillar de verdad. Nunca dejes que nadie te haga dudarlo.",
+    "Tienes un encanto difícil de explicar. Llegas y todo mejora un poquito; te vas y dejas una sonrisa. Eso, mi querida, es un don que pocos tienen.",
+    "Qué maravilla de persona eres: fuerte, dulce y brillante a la vez. El mundo tiene suerte de tenerte, aunque a veces no te lo digan lo suficiente.",
+    "Contigo cerca todo se siente más cálido. Tienes esa magia de hacer sentir bien a los demás, y eso te vuelve todavía más hermosa.",
+    "Sos única, de verdad. No hay nadie que sonría como tú ni que ilumine un lugar con solo entrar. Que nunca se te olvide lo especial que eres.",
+    "Eres capaz, eres linda y eres valiosa, aunque a veces el espejo no te lo diga. Hoy que alguien te lo recuerde: eres todo un encanto de persona."
   ]
 };
 
