@@ -2081,19 +2081,35 @@
       const err = letterCard.querySelector('.lc-error');
       const pin = (pinInput.value || '').trim();
       err.textContent = 'Abriendo…';
-      let data = null;
-      try {   // producción: las cartas vienen privadas desde el servidor
-        const r = await fetch('/api/carta?pin=' + encodeURIComponent(pin), { cache: 'no-store' });
-        if (r.status === 200) { const d = await r.json(); if (d && d.ok) data = d; }
-      } catch (_) { /* sin backend: probamos el respaldo local */ }
-      if (!data && cartas && cartas.pin && pin === cartas.pin) data = cartas;   // local (cartas.json)
-      if (!data) { err.textContent = 'Pin incorrecto… inténtalo otra vez.'; pinInput.value = ''; return; }
-      err.textContent = '';
-      cartaPin = pin;   // guardamos el pin validado para poder enviar mensajes
-      renderCarta(data);
-      letterCard.querySelector('.lc-lock').hidden = true;
-      letterCard.querySelector('.lc-content').hidden = false;
-      letterCard.scrollTop = 0;
+
+      let data = null, serverAnswered = false, serverOk = false;
+      for (let i = 0; i < 2 && !serverAnswered; i++) {   // reintenta si hay hipo de red
+        try {
+          const r = await fetch('/api/carta?pin=' + encodeURIComponent(pin), { cache: 'no-store' });
+          if (r.status === 200) {
+            const d = await r.json();
+            if (d && typeof d.ok !== 'undefined') { serverAnswered = true; serverOk = !!d.ok; if (d.ok) data = d; }
+          }
+        } catch (_) { /* reintenta */ }
+      }
+      // respaldo local (solo en desarrollo, con cartas.json)
+      if (!data && !serverAnswered && cartas && cartas.pin && pin === cartas.pin) { data = cartas; serverOk = true; }
+
+      if (data) {
+        err.textContent = '';
+        cartaPin = pin;   // pin validado, para poder enviar mensajes
+        renderCarta(data);
+        letterCard.querySelector('.lc-lock').hidden = true;
+        letterCard.querySelector('.lc-content').hidden = false;
+        letterCard.scrollTop = 0;
+        return;
+      }
+      if (serverAnswered && !serverOk) {   // el servidor dijo que el pin está mal
+        err.textContent = 'Pin incorrecto… inténtalo otra vez.';
+        pinInput.value = '';
+      } else {                             // no respondió: problema de red, no es el pin
+        err.textContent = 'Hubo un problemita al abrir. Intenta de nuevo en un momento.';
+      }
     }
     function renderCarta(data) {
       const c = (data.cartas || []).find(x => x.fecha === todayStr());
@@ -2120,15 +2136,20 @@
       const msg = (ta.value || '').trim();
       if (!msg) { sent.textContent = 'Escribe algo primero 🙂'; return; }
       sent.textContent = 'Enviando…';
-      try {
-        const r = await fetch('/api/mensaje', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin: cartaPin, mensaje: msg })
-        });
-        if (r.ok) { sent.textContent = '¡Enviado! Gracias 💛'; ta.value = ''; }
-        else { sent.textContent = 'No se pudo enviar por ahora (falta configurar el guardado).'; }
-      } catch (_) { sent.textContent = 'No se pudo enviar (sin conexión al servidor).'; }
+      for (let i = 0; i < 2; i++) {   // reintenta una vez si hay hipo
+        try {
+          const r = await fetch('/api/mensaje', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: cartaPin, mensaje: msg })
+          });
+          if (r.ok) {
+            const d = await r.json().catch(() => ({ ok: true }));
+            if (d.ok !== false) { sent.textContent = '¡Enviado! Gracias 💛'; ta.value = ''; return; }
+          }
+        } catch (_) { /* reintenta */ }
+      }
+      sent.textContent = 'No se pudo enviar. Intenta de nuevo en un momento.';
     }
     letterCard.querySelector('.lc-send').addEventListener('click', enviarMensaje);
 

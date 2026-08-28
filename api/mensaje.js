@@ -1,11 +1,14 @@
-// api/mensaje.js — recibe el mensaje que ella escribe y lo reenvía a un webhook
-// de Google Apps Script (una hoja de cálculo) para guardarlo con fecha y hora.
-// La URL del webhook vive SOLO en la variable de entorno MENSAJES_WEBHOOK_URL,
-// así no queda expuesta en el repo público.
+// api/mensaje.js — recibe el mensaje que ella escribe y lo reenvía al webhook de
+// Apps Script (hoja de cálculo) para guardarlo con fecha y hora.
 //
-// Configurar en Vercel (Settings → Environment Variables):
-//   MENSAJES_WEBHOOK_URL = https://script.google.com/macros/s/XXXXX/exec
-//   CARTA_PIN            = 02052026   (opcional; valida el pin al enviar)
+// Nota importante: el web app de Apps Script EJECUTA doPost (escribe la fila) y
+// LUEGO responde con un 302 hacia googleusercontent. Por eso, si la petición
+// llegó, el mensaje ya quedó guardado aunque la respuesta final no sea JSON
+// limpio. Solo se considera error si el fetch falla de verdad (error de red).
+//
+// Configurar en Vercel:
+//   SHEET_WEBHOOK_URL = https://script.google.com/macros/s/XXXXX/exec
+//   CARTA_PIN         = 02052026   (opcional; valida el pin al enviar)
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -28,18 +31,23 @@ module.exports = async (req, res) => {
   const registro = {
     mensaje: mensaje,
     fechaISO: new Date().toISOString(),
-    ip: (req.headers['x-forwarded-for'] || '').split(',')[0] || null,
+    ip: ((req.headers['x-forwarded-for'] || '').split(',')[0] || '').trim() || null,
     ua: req.headers['user-agent'] || null
   };
+
   try {
     const r = await fetch(hook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registro)
     });
-    if (!r.ok) return res.status(502).json({ ok: false, error: 'hook' });
+    // Si el webhook alcanzó a responder un JSON con ok:false, es un error real del script.
+    try {
+      const d = JSON.parse(await r.text());
+      if (d && d.ok === false) return res.status(200).json({ ok: false, error: d.error || 'sheet' });
+    } catch (_) { /* cuerpo no-JSON por el redirect: la fila ya se escribió */ }
     return res.status(200).json({ ok: true });
   } catch (e) {
-    return res.status(502).json({ ok: false, error: 'hook' });
+    return res.status(502).json({ ok: false, error: 'red' });
   }
 };
