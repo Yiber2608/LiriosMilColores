@@ -529,15 +529,42 @@
       pointer-events: none;
       transition: opacity 0.8s ease, transform 0.8s ease;
     }
-    body.letter-open .letter-card { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    body.letter-open .letter-card { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
     .letter-card .lc-title {
       font-family: 'Great Vibes', cursive; font-weight: 400;
       font-size: clamp(1.7rem, 5vw, 2.5rem); color: #d05f92; margin-bottom: 12px;
     }
     .letter-card .lc-msg {
-      font-family: 'Cormorant Garamond', serif; font-style: italic;
-      font-size: clamp(1.05rem, 3vw, 1.4rem); line-height: 1.65;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.8vw, 1.26rem); line-height: 1.7;
+      text-align: left;
     }
+    .letter-card .lc-msg p { margin: 0 0 0.9em; }
+    .lc-seal { font-size: 2.6rem; margin-bottom: 8px; }
+    .lc-hint { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; margin-bottom: 16px; color: #8a5266; }
+    .lc-pin {
+      font-family: inherit; font-size: 1.1rem; text-align: center; letter-spacing: 0.15em;
+      padding: 10px 14px; width: 220px; max-width: 82%;
+      border: 1px solid #e6a9c0; border-radius: 10px; background: #fff; color: #6a3a4d; outline: none;
+    }
+    .lc-unlock, .lc-send {
+      display: inline-block; margin-top: 14px; cursor: pointer;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
+      color: #fff; background: linear-gradient(180deg, #ff8fbf, #e05f92);
+      border: none; border-radius: 10px; padding: 10px 22px;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .lc-unlock:hover, .lc-send:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    .lc-error { color: #c0396b; font-style: italic; margin-top: 10px; min-height: 1.2em; }
+    .lc-reply { margin-top: 22px; padding-top: 18px; border-top: 1px dashed #f0c0d4; text-align: center; }
+    .lc-reply-label { font-family: 'Great Vibes', cursive; font-size: 1.5rem; color: #d05f92; margin-bottom: 10px; }
+    .lc-reply-text {
+      width: 100%; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
+      padding: 12px 14px; border: 1px solid #e6a9c0; border-radius: 10px;
+      background: #fff; color: #6a3a4d; resize: vertical; outline: none;
+    }
+    .lc-sent { color: #8a5266; font-style: italic; margin-top: 8px; min-height: 1.2em; }
     .letter-card .lc-close {
       margin-top: 20px; font-size: 0.72rem; letter-spacing: 0.25em;
       text-transform: uppercase; color: #c79bb0;
@@ -1364,10 +1391,25 @@
     </svg>
   </div>
 
-  <!-- Tarjeta de la carta (mensaje por fecha) -->
+  <!-- Tarjeta de la carta (pin + carta por fecha + respuesta) -->
   <div class="letter-card">
-    <h3 class="lc-title"></h3>
-    <p class="lc-msg"></p>
+    <div class="lc-lock">
+      <div class="lc-seal">💌</div>
+      <p class="lc-hint">Una carta para ti. Escribe el pin para leerla.</p>
+      <input class="lc-pin" type="password" inputmode="numeric" autocomplete="off" placeholder="pin (DDMMAAAA)" maxlength="12" />
+      <button class="lc-unlock">Abrir carta</button>
+      <p class="lc-error"></p>
+    </div>
+    <div class="lc-content" hidden>
+      <h3 class="lc-title"></h3>
+      <div class="lc-msg"></div>
+      <div class="lc-reply">
+        <p class="lc-reply-label">¿Quieres dejarme un mensaje?</p>
+        <textarea class="lc-reply-text" rows="3" placeholder="Escribe aquí lo que quieras contarme…"></textarea>
+        <button class="lc-send">Enviar</button>
+        <p class="lc-sent"></p>
+      </div>
+    </div>
     <div class="lc-close">toca fuera para cerrar</div>
   </div>
 
@@ -1986,24 +2028,70 @@
       const dd = String(d.getDate()).padStart(2, '0');
       return d.getFullYear() + '-' + mm + '-' + dd;
     }
+    const letterCard = document.querySelector('.letter-card');
     document.getElementById('letter-bird').addEventListener('click', openLetter);
+
     function openLetter() {
       if (activeMode) { stopMode(activeMode); activeMode = null; }
       stopBirdSong();
       closeReveal(); hideChooser();
-      const hoy = todayStr();
-      const c = (cartas.cartas || []).find(x => x.fecha === hoy);
-      const card = document.querySelector('.letter-card');
-      if (c) {
-        card.querySelector('.lc-title').textContent = c.titulo || 'Para ti';
-        card.querySelector('.lc-msg').textContent = c.mensaje || '';
-      } else {
-        card.querySelector('.lc-title').textContent = '···';
-        card.querySelector('.lc-msg').textContent = cartas.mensajeNoDisponible || 'Hoy no puedes ver este mensaje.';
-      }
+      letterCard.querySelector('.lc-lock').hidden = false;
+      letterCard.querySelector('.lc-content').hidden = true;
+      letterCard.querySelector('.lc-pin').value = '';
+      letterCard.querySelector('.lc-error').textContent = '';
+      letterCard.querySelector('.lc-sent').textContent = '';
+      letterCard.querySelector('.lc-reply-text').value = '';
       document.body.classList.add('letter-open');
+      setTimeout(() => letterCard.querySelector('.lc-pin').focus(), 300);
     }
     function closeLetter() { document.body.classList.remove('letter-open'); }
+
+    function unlockLetter() {
+      const pinInput = letterCard.querySelector('.lc-pin');
+      const err = letterCard.querySelector('.lc-error');
+      if ((pinInput.value || '').trim() !== (cartas.pin || '')) {
+        err.textContent = 'Pin incorrecto… inténtalo otra vez.';
+        pinInput.value = '';
+        return;
+      }
+      const c = (cartas.cartas || []).find(x => x.fecha === todayStr());
+      const titleEl = letterCard.querySelector('.lc-title');
+      const msgEl = letterCard.querySelector('.lc-msg');
+      msgEl.innerHTML = '';
+      if (c) {
+        titleEl.textContent = c.titulo || 'Para ti';
+        const parras = (c.parrafos && c.parrafos.length) ? c.parrafos : [c.mensaje || ''];
+        parras.forEach(p => { const el = document.createElement('p'); el.textContent = p; msgEl.appendChild(el); });
+      } else {
+        titleEl.textContent = '···';
+        const el = document.createElement('p');
+        el.textContent = cartas.mensajeNoDisponible || 'Hoy no puedes ver este mensaje.';
+        msgEl.appendChild(el);
+      }
+      letterCard.querySelector('.lc-lock').hidden = true;
+      letterCard.querySelector('.lc-content').hidden = false;
+      letterCard.scrollTop = 0;
+    }
+    letterCard.querySelector('.lc-unlock').addEventListener('click', unlockLetter);
+    letterCard.querySelector('.lc-pin').addEventListener('keydown', e => { if (e.key === 'Enter') unlockLetter(); });
+
+    async function enviarMensaje() {
+      const ta = letterCard.querySelector('.lc-reply-text');
+      const sent = letterCard.querySelector('.lc-sent');
+      const msg = (ta.value || '').trim();
+      if (!msg) { sent.textContent = 'Escribe algo primero 🙂'; return; }
+      sent.textContent = 'Enviando…';
+      try {
+        const r = await fetch('/api/mensaje', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: cartas.pin, mensaje: msg })
+        });
+        if (r.ok) { sent.textContent = '¡Enviado! Gracias 💛'; ta.value = ''; }
+        else { sent.textContent = 'No se pudo enviar por ahora (falta configurar el guardado).'; }
+      } catch (_) { sent.textContent = 'No se pudo enviar (sin conexión al servidor).'; }
+    }
+    letterCard.querySelector('.lc-send').addEventListener('click', enviarMensaje);
 
     function openMain() {
       if (currentBird === mainBird && document.body.classList.contains('bird-reveal')) {

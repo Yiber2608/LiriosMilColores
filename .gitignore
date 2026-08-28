@@ -1,0 +1,4 @@
+cartas.json
+.env
+.env.local
+*.local
