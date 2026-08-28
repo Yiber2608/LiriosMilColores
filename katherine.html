@@ -2029,6 +2029,7 @@
       return d.getFullYear() + '-' + mm + '-' + dd;
     }
     const letterCard = document.querySelector('.letter-card');
+    let cartaPin = '';   // pin validado al abrir la carta (para enviar mensajes)
     document.getElementById('letter-bird').addEventListener('click', openLetter);
 
     function openLetter() {
@@ -2059,6 +2060,7 @@
       if (!data && cartas && cartas.pin && pin === cartas.pin) data = cartas;   // local (cartas.json)
       if (!data) { err.textContent = 'Pin incorrecto… inténtalo otra vez.'; pinInput.value = ''; return; }
       err.textContent = '';
+      cartaPin = pin;   // guardamos el pin validado para poder enviar mensajes
       renderCarta(data);
       letterCard.querySelector('.lc-lock').hidden = true;
       letterCard.querySelector('.lc-content').hidden = false;
@@ -2093,7 +2095,7 @@
         const r = await fetch('/api/mensaje', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin: cartas.pin, mensaje: msg })
+          body: JSON.stringify({ pin: cartaPin, mensaje: msg })
         });
         if (r.ok) { sent.textContent = '¡Enviado! Gracias 💛'; ta.value = ''; }
         else { sent.textContent = 'No se pudo enviar por ahora (falta configurar el guardado).'; }
