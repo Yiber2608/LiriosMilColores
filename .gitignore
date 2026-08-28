@@ -1,4 +1,5 @@
 cartas.json
+apps-script-cartas.gs
 .env
 .env.local
 *.local
