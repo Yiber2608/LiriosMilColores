@@ -2037,8 +2037,14 @@
 
     /* Salir de una frase: clic en el espacio vacío (el velo) cierra la revelación */
     document.querySelector('.reveal-veil').addEventListener('click', () => {
-      if (document.body.classList.contains('bird-reveal')) { closeReveal(); hideChooser(); }
-      if (document.body.classList.contains('letter-open')) closeLetter();
+      if (document.body.classList.contains('letter-open')) { closeLetter(); return; }
+      if (document.body.classList.contains('bird-reveal')) {
+        if (document.body.classList.contains('joke-open')) {
+          revealPhraseNow();   // aún está el chiste: primero asegura que salga la frase
+        } else {
+          closeReveal(); hideChooser();   // la frase ya se vio: ahora sí cerrar
+        }
+      }
     });
 
     /* ── Cartica por fecha (mensajes configurables en cartas.json) ── */
@@ -2248,11 +2254,14 @@
       res.innerHTML = (correct ? 'uff, eres buena 😌' : 'nahh, perdiste 🙈') + '<small>— mis chistes malos</small>';
       res.classList.add('show');
       clearTimeout(jokeTimer);
-      jokeTimer = setTimeout(() => {
-        if (!document.body.classList.contains('bird-reveal')) return; // ya se cerró
-        document.body.classList.remove('joke-open');
-        setRevealText(nextPhrase());   // ahora sí, la frase según el ánimo
-      }, 2300);
+      jokeTimer = setTimeout(revealPhraseNow, 2300);   // tras un momento, sale la frase sola
+    }
+
+    function revealPhraseNow() {   // asegura que la frase se muestre (por tiempo o por click)
+      if (!document.body.classList.contains('bird-reveal')) return; // ya se cerró todo
+      clearTimeout(jokeTimer);
+      document.body.classList.remove('joke-open');
+      setRevealText(nextPhrase());   // la frase según el ánimo
     }
 
     function setRevealText(txt) {
