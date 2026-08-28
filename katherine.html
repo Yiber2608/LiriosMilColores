@@ -1624,7 +1624,7 @@
         return;
       }
       if (activeMode) stopMode(activeMode);
-      if (currentBird) closeBird();   // cierra un pajarito si estaba abierto
+      closeReveal(); stopBirdSong();   // corta la música de criaturas para dar paso a la del tulipán
       hideChooser();
       activeMode = mode;
       songs[mode].currentTime = 0;
@@ -2033,9 +2033,7 @@
     document.getElementById('letter-bird').addEventListener('click', openLetter);
 
     function openLetter() {
-      if (activeMode) { stopMode(activeMode); activeMode = null; }
-      stopBirdSong();
-      closeReveal(); hideChooser();
+      closeReveal(); hideChooser();   // la música sigue sonando mientras se lee la carta
       letterCard.querySelector('.lc-lock').hidden = false;
       letterCard.querySelector('.lc-content').hidden = true;
       letterCard.querySelector('.lc-pin').value = '';
@@ -2105,9 +2103,9 @@
 
     function openMain() {
       if (currentBird === mainBird && document.body.classList.contains('bird-reveal')) {
-        closeBird(); hideChooser(); return;      // volver a tocar = cerrar
+        closeReveal(); hideChooser(); return;      // volver a tocar = cerrar (la música sigue)
       }
-      if (activeMode) { stopMode(activeMode); activeMode = null; stopBirdSong(); }
+      if (activeMode) { stopMode(activeMode); activeMode = null; }
       closeReveal();
       currentBird = mainBird;
       mainBird.classList.add('bird-active');
@@ -2178,8 +2176,8 @@
 
     /* ── Abrir una criatura: primero el CHISTE, luego la frase ──── */
     function openCreature(el) {
-      if (currentBird === el) { closeBird(); return; }
-      if (activeMode) { stopMode(activeMode); activeMode = null; stopBirdSong(); }
+      if (currentBird === el) { closeReveal(); return; }   // cerrar sin cortar la música
+      if (activeMode) { stopMode(activeMode); activeMode = null; }
       closeReveal();
       currentBird = el;
       el.classList.add('bird-active');
@@ -2242,9 +2240,9 @@
     function randomFrom(list) { return list[Math.floor(Math.random() * list.length)]; }
 
     function playBirdSong(src) {
-      const now = Date.now();
-      // Si ya suena una canción y aún no pasa el minuto → NO se cambia (solo cambia la frase)
-      if (currentBirdAudio && !currentBirdAudio.paused && now < songLockUntil) return;
+      // Música ESTABLE: si ya hay algo sonando, NO se cambia (solo cambia el chiste/frase).
+      // La canción solo avanza sola cuando termina, o arranca si no hay nada sonando.
+      if (currentBirdAudio && !currentBirdAudio.paused) return;
       startSong(src);
     }
     function startSong(src) {
