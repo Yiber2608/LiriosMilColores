@@ -2325,6 +2325,24 @@
     loadChistes();               // precarga chistes
     fetch('/api/visita', { method: 'POST', cache: 'no-store' }).catch(function () {}); // registra la visita
 
+    /* Tiempo en la página (heartbeat): manda la duración cada 20s y al salir */
+    (function sesion() {
+      var SID = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      var t0 = Date.now();
+      function ping(fin) {
+        var dur = Math.round((Date.now() - t0) / 1000);
+        var payload = JSON.stringify({ tipo: 'sesion', sid: SID, dur: dur });
+        if (fin && navigator.sendBeacon) {
+          try { navigator.sendBeacon('/api/visita', new Blob([payload], { type: 'application/json' })); return; } catch (_) {}
+        }
+        fetch('/api/visita', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function () {});
+      }
+      ping(false);                                       // primer latido (crea la sesión)
+      setInterval(function () { ping(false); }, 20000);  // cada 20 s
+      document.addEventListener('visibilitychange', function () { if (document.hidden) ping(true); });
+      window.addEventListener('pagehide', function () { ping(true); });
+    })();
+
     function closeReveal() {     // cierra solo la revelación visual (la canción sigue)
       clearTimeout(jokeTimer);   // evita que un chiste viejo pise la nueva revelación
       if (currentBird) { currentBird.classList.remove('bird-active'); currentBird = null; }
