@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch (_) { body = {}; } }
   body = body || {};
 
-  const mensaje = (body.mensaje || '').toString().slice(0, 4000).trim();
+  const mensaje = (body.mensaje || '').toString().slice(0, 20000).trim();
   const pin = (body.pin || '').toString();
   if (!mensaje) return res.status(400).json({ ok: false, error: 'vacio' });
   if (process.env.CARTA_PIN && pin !== process.env.CARTA_PIN) {
