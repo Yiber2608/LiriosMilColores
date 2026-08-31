@@ -1958,7 +1958,7 @@
     let chisteCache = [];
     async function loadChistes() {
       try {
-        const r = await fetch('/api/chiste?n=8', { cache: 'no-store' });
+        const r = await fetch('/api/chiste?n=12', { cache: 'no-store' });
         if (r.ok) {
           const d = await r.json();
           if (Array.isArray(d.chistes) && d.chistes.length) { chisteCache = d.chistes; return; }
@@ -2000,6 +2000,7 @@
       if (!phraseQueue.length) {
         phraseQueue = shuffleArr(pool);
         if (phraseQueue.length > 1 && phraseQueue[0] === lastPhrase) phraseQueue.push(phraseQueue.shift());
+        loadPhrases();   // se agotó la tanda → trae frases nuevas de IA para el próximo ciclo
       }
       lastPhrase = phraseQueue.shift();
       return lastPhrase;
@@ -2009,6 +2010,7 @@
       if (!jokeQueue.length) {
         jokeQueue = shuffleArr(pool);
         if (jokeQueue.length > 1 && jokeQueue[0] === lastJoke) jokeQueue.push(jokeQueue.shift());
+        loadChistes();   // se agotó la tanda → trae chistes nuevos de IA para el próximo ciclo
       }
       lastJoke = jokeQueue.shift();
       return lastJoke;
@@ -2240,7 +2242,6 @@
       document.body.classList.add('bird-reveal');
       stardustFromBird(el);
       showJoke();
-      loadPhrases();             // refresca frases en segundo plano
     }
 
     /* ── Chiste con 2 opciones ─────────────────────────────────── */
@@ -2260,7 +2261,6 @@
       const res = document.querySelector('.joke-result');
       res.className = 'joke-result'; res.innerHTML = '';
       document.body.classList.add('joke-open');
-      loadChistes();             // refresca chistes en segundo plano
     }
     document.querySelectorAll('.joke-opt').forEach(b => {
       b.addEventListener('click', () => answerJoke(b));
@@ -2322,7 +2322,7 @@
     }
 
     loadPhrases();               // precarga inicial (ánimo por defecto)
-    loadChistes();               // precarga chistes
+    setTimeout(loadChistes, 2500);  // chistes un poco después, para no chocar con las frases en Groq
     fetch('/api/visita', { method: 'POST', cache: 'no-store' }).catch(function () {}); // registra la visita
 
     /* Tiempo en la página (heartbeat): manda la duración cada 20s y al salir */
